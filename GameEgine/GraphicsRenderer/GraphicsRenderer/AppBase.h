@@ -1,11 +1,48 @@
-#include <Windows.h>
+// windows
+#include <windows.h>
+#include <wrl.h> // ComPtr
+
+// ImGUI
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+
+// DirectX
+#include <d3d11.h>
+#include <d3dcompiler.h>
+
+using Microsoft::WRL::ComPtr;
 
 class AppBase {
 public:
 	AppBase();
 	~AppBase();
-	// 윈도우 입력 전달
+
 	LRESULT CALLBACK MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevIstance, PWSTR pCmdLine, int nCmdShow);
+	bool Initialize();
+	int Run();
+protected:
+	bool InitWindow();
+	bool InitD3D();
+	bool InitGUI();
+	void UpdateGUI();
+
 public:
+	int m_screenWidth;
+	int m_screenHeight;
+	HWND m_mainWindow;
+
+	ComPtr<ID3D11Device> m_device;
+	ComPtr<ID3D11DeviceContext> m_context;
+	ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
+	ComPtr<IDXGISwapChain> m_swapChain;
+	ComPtr<ID3D11RasterizerState> m_rasterizerState;
+
+	// Depth/Stencil 관련
+	ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
+	ComPtr<ID3D11DepthStencilView> m_depthStencilView;
+	ComPtr<ID3D11DepthStencilState> m_depthStencilState;
+
+	D3D11_VIEWPORT m_screenViewPort;
+
 };

@@ -1,10 +1,9 @@
-#include "AppBase.h"
+#include "Graphics.h"
 #include <iostream>
 
 int main()
 {
-	AppBase app;
-	IMGUI_VERSION;
+	Graphics app;
 	if (!app.Initialize())
 	{
 		std::cout << "Initialization failed.\n";

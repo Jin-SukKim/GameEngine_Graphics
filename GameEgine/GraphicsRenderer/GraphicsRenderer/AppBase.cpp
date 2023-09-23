@@ -204,11 +204,11 @@ bool AppBase::InitD3D()
 	sd.Windowed = TRUE; // 테두리 있는 윈도우 모드
 	// 윈도우창 모드와 전체화면 모드 변경 가능
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // _FLIP_ 사용 시 MSAA 미지원
 	// 마지막 swap-chain의 buffer는 MSAA를 사용하지 않는다.
 	sd.SampleDesc.Count = 1;
 	sd.SampleDesc.Quality = 0;
-	
+
 	// Swap-Chain, device, context 생성
 	if (FAILED(D3D11CreateDeviceAndSwapChain(
 		0,								// IDXGIAdapter Type (default)
@@ -241,6 +241,7 @@ bool AppBase::InitD3D()
 	{
 		std::cout << "MSAA not supported.\n";
 	}
+
 
 	// Swap-Chain의 Back-Buffer (화면 출력)
 	ComPtr<ID3D11Texture2D> backBuffer;
@@ -289,16 +290,21 @@ bool AppBase::InitD3D()
 	depthStencilBufferDesc.ArraySize = 1;
 	// Depth 24bit / Stencil 8 bit 사용
 	depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	// 현재 Depth만 사용하고 MSAA는 사용하고 있지 않다.
+	depthStencilBufferDesc.SampleDesc.Count = 1;
+	depthStencilBufferDesc.SampleDesc.Quality = 0;
+	/*
 	// MSAA
 	if (numQualityLevels > 0)
 	{
-		depthStencilBufferDesc.SampleDesc.Count = 4;
+		depthStencilBufferDesc.SampleDesc.Count = 4; // 몇 개를 MultiSamples할 지
 		depthStencilBufferDesc.SampleDesc.Quality = numQualityLevels - 1;
 	}
 	else {
 		depthStencilBufferDesc.SampleDesc.Count = 1;
 		depthStencilBufferDesc.SampleDesc.Quality = 0;
 	}
+	*/
 	// DepthStencil 메모리 공간 사용 설정
 	depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT; // GPU가 읽고 쓰기 가능
 	// Depth/Stencil 버퍼로 사용 가능
@@ -403,8 +409,8 @@ void AppBase::CreateVSAndInputLayout(const std::wstring& filename, const std::ve
 		0,					// macro
 		0,					// shader에 Include 넣어줄 때 사용 (D3D_COMPILE_STANDARD_FILE_INCLUDE)
 		"VSmain",			// Shader의 entryPoint
-		"vs_5_1",			// Shader version
-		compileFlags,		// Compile option
+		"vs_5_0",			// Shader version
+		0,		// Compile option
 		0,					// Compile Option (주로 0 사용)
 		&shaderBlob,		// 임의의 데이터 공간
 		&errorBlob			// 임의의 데이터 공간
@@ -444,7 +450,7 @@ void AppBase::CreatePS(const std::wstring& filename, ComPtr<ID3D11PixelShader>& 
 #endif
 
 	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(), 0, 0, "PSmain", "ps_5_1", compileFlags, 0, 
+		filename.c_str(), 0, 0, "PSmain", "ps_5_0", compileFlags, 0, 
 		&shaderBlob, &errorBlob);
 
 	CheckResult(hr, errorBlob.Get());
@@ -456,14 +462,14 @@ void AppBase::CreatePS(const std::wstring& filename, ComPtr<ID3D11PixelShader>& 
 
 void AppBase::CreateIndexBuffer(const std::vector<uint16_t>& indices, ComPtr<ID3D11Buffer>& indexBuffer)
 {
-	D3D11_BUFFER_DESC bDesc;
+	D3D11_BUFFER_DESC bDesc = {};
 	bDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	bDesc.ByteWidth = UINT(sizeof(uint16_t) * indices.size());
 	bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bDesc.CPUAccessFlags = 0;
 	bDesc.StructureByteStride = sizeof(uint16_t);
 
-	D3D11_SUBRESOURCE_DATA indexBufferData;
+	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
 	indexBufferData.pSysMem = indices.data();
 	indexBufferData.SysMemPitch = 0;
 	indexBufferData.SysMemSlicePitch = 0;

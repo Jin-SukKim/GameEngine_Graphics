@@ -11,7 +11,7 @@ cbuffer MeshConstantBuffer : register(b0) // buffer는 register b 사용
 struct VSInput
 {
     float3 pos : POSITION;
-    float3 color : COLOR;
+    float3 color : COLOR0;
 };
 
 // Vertex Shader Output 구조체

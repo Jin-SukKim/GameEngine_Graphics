@@ -1,123 +1,5 @@
 #include "Graphics.h"
-
-auto MakeBox()
-{
-    std::vector<Vector3> positions;
-    std::vector<Vector3> colors;
-    std::vector<Vector3> normals;
-
-    const float scale = 1.0f;
-
-    // 윗면
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-
-    // 아랫면
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-
-    // 앞면
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-
-    // 뒷면
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-
-    // 왼쪽
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-
-    // 오른쪽
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-
-    // Vertex 형식이 정해져 있다.
-    std::vector<Vertex> vertices;
-    for (size_t i = 0; i < positions.size(); i++) {
-        Vertex v;
-        v.position = positions[i];
-        v.color = colors[i];
-        vertices.push_back(v);
-    }
-
-    // index의 값을 unsigned int16으로 받고 있다. (16bit)
-    // 큰 모델을 사용할 때는 uint32_t도 사용하고 작으면 uint8_t도 사용한다.
-    std::vector<uint16_t> indices = {
-        0,  1,  2,  0,  2,  3,  // 윗면
-        4,  5,  6,  4,  6,  7,  // 아랫면
-        8,  9,  10, 8,  10, 11, // 앞면
-        12, 13, 14, 12, 14, 15, // 뒷면
-        16, 17, 18, 16, 18, 19, // 왼쪽
-        20, 21, 22, 20, 22, 23  // 오른쪽
-    };
-
-    // tuple을 사용해 두 vector를 return
-    return std::tuple{ vertices, indices };
-
-}
-
-// 정육면체 생성
+#include "GeometryGenerator.h"
 Graphics::Graphics() : AppBase(), m_indexCount(0)
 {
 }
@@ -128,20 +10,20 @@ bool Graphics::Initialize()
 		return false;
 
     // Geometry 정의
-    auto [vertices, indices] = MakeBox();
+    MeshData cube = GeometryGenerator::MakeCube();
 
     // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
-    AppBase::CreateVertexBuffer(vertices, m_vertexBuffer);
+    D3D11Utils::CreateVertexBuffer(m_device, cube.vertices, m_vertexBuffer);
 
     // Index Buffer 생성 후 CPU -> GPU 데이터 복사
-    m_indexCount = UINT(indices.size());
-    AppBase::CreateIndexBuffer(indices, m_indexBuffer);
+    m_indexCount = UINT(cube.indices.size());
+    D3D11Utils::CreateIndexBuffer(m_device, cube.indices, m_indexBuffer);
 
     // 변환 정의할 때 사용할 Buffer
     m_constantBufferData.world = Matrix();      // World 행렬
     m_constantBufferData.view = Matrix();       // View 행렬
     m_constantBufferData.proj = Matrix(); // Projection 행렬
-    AppBase::CreateConstantBuffer(m_constantBufferData, m_constantBuffer);
+    D3D11Utils::CreateConstantBuffer(m_device, m_constantBufferData, m_constantBuffer);
 
     // Shader 생성
     
@@ -153,11 +35,11 @@ bool Graphics::Initialize()
     };
 
     // InputLayout & Vertex Shader 생성
-    AppBase::CreateVSAndInputLayout(L"Shader/BasicVS.hlsl", inputElements,
+    D3D11Utils::CreateVSAndInputLayout(m_device, L"Shader/BasicVS.hlsl", inputElements,
         m_vertexShader, m_inputLayout);
 
     // Pixel Shader 생성
-    AppBase::CreatePS(L"Shader/BasicPS.hlsl", m_pixelShader);
+    D3D11Utils::CreatePS(m_device, L"Shader/BasicPS.hlsl", m_pixelShader);
 
 	return true;
 }
@@ -201,7 +83,7 @@ void Graphics::Update(float dt)
     m_constantBufferData.proj = m_constantBufferData.proj.Transpose();
 
     // Constant Buffer Data를 CPU -> GPU 복사
-    AppBase::UpdateBuffer(m_constantBufferData, m_constantBuffer);
+    D3D11Utils::UpdateBuffer(m_context, m_constantBufferData, m_constantBuffer);
 }
 
 void Graphics::Render()

@@ -1,4 +1,6 @@
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\AppBase.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\AppBase.obj
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\D3D11Utils.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\D3D11Utils.obj
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\GeometryGenerator.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\GeometryGenerator.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Graphics.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\Graphics.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\ImGUI\backends\imgui_impl_dx10.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\imgui_impl_dx10.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\ImGUI\backends\imgui_impl_dx11.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\imgui_impl_dx11.obj

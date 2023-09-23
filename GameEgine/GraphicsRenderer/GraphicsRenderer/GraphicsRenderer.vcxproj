@@ -189,6 +189,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppBase.cpp" />
+    <ClCompile Include="D3D11Utils.cpp" />
+    <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="ImGUI\backends\imgui_impl_dx10.cpp" />
     <ClCompile Include="ImGUI\backends\imgui_impl_dx11.cpp" />
@@ -203,6 +205,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppBase.h" />
+    <ClInclude Include="ConstantData.h" />
+    <ClInclude Include="D3D11Utils.h" />
+    <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="ImGUI\backends\imgui_impl_dx10.h" />
     <ClInclude Include="ImGUI\backends\imgui_impl_dx11.h" />
@@ -214,6 +219,8 @@
     <ClInclude Include="ImGUI\imstb_rectpack.h" />
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
+    <ClInclude Include="MeshData.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shader\BasicPS.hlsl">

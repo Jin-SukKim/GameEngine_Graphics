@@ -30,6 +30,8 @@ protected:
 
 	MeshConstData m_constantBufferData;
 
+	// ImGUI parameters
 	// 원근 투영을 사용할 것인지
 	bool m_usePerspectiveProjection = true;
+	bool m_wireFrame = false;
 };

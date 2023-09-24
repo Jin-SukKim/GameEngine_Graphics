@@ -1,8 +1,9 @@
 // Pixel Shader Input ±¸Á¶Ã¼
 struct VSOutput
 {
-    float4 pos : SV_POSITION;
+    float4 posProj : SV_POSITION;
     float3 color : COLOR;
+    float2 texcoord : TEXCOORD;
 };
 
 float4 PSmain(VSOutput input) : SV_Target

@@ -42,7 +42,6 @@ public:
 	AppBase();
 	~AppBase();
 
-	virtual LRESULT CALLBACK MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual bool Initialize();
 	int Run();
 
@@ -70,7 +69,8 @@ public:
 	ComPtr<ID3D11DeviceContext> m_context;
 	ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
 	ComPtr<IDXGISwapChain> m_swapChain;
-	ComPtr<ID3D11RasterizerState> m_rasterizerState;
+	ComPtr<ID3D11RasterizerState> m_SolidRasterizerState;
+	ComPtr<ID3D11RasterizerState> m_WireRasterizerState;
 
 	// Depth/Stencil ฐüทร
 	ComPtr<ID3D11Texture2D> m_depthStencilBuffer;

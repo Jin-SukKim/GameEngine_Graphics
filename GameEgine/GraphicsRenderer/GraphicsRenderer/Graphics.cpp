@@ -9,15 +9,18 @@ bool Graphics::Initialize()
 	if (!AppBase::Initialize())
 		return false;
 
-    // Geometry 정의
-    MeshData cube = GeometryGenerator::MakeCube();
+    // Circle 생성
+    {
+        // Geometry 정의
+        MeshData mesh = GeometryGenerator::MakeGrid(2.0f, 2.0f, 10, 10);
 
-    // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
-    D3D11Utils::CreateVertexBuffer(m_device, cube.vertices, m_vertexBuffer);
+        // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
+        D3D11Utils::CreateVertexBuffer(m_device, mesh.vertices, m_vertexBuffer);
 
-    // Index Buffer 생성 후 CPU -> GPU 데이터 복사
-    m_indexCount = UINT(cube.indices.size());
-    D3D11Utils::CreateIndexBuffer(m_device, cube.indices, m_indexBuffer);
+        // Index Buffer 생성 후 CPU -> GPU 데이터 복사
+        m_indexCount = UINT(mesh.indices.size());
+        D3D11Utils::CreateIndexBuffer(m_device, mesh.indices, m_indexBuffer);
+    }
 
     // 변환 정의할 때 사용할 Buffer
     m_constantBufferData.world = Matrix();      // World 행렬
@@ -31,7 +34,9 @@ bool Graphics::Initialize()
     std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
         // COLOR가 시작되는 위치로 POSITION이 RGB 각각 4 byte씩 할당한 다음부터 시작하므로 4(byte) * 3(개수)
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
+        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 9, D3D11_INPUT_PER_VERTEX_DATA, 0}
     };
 
     // InputLayout & Vertex Shader 생성
@@ -47,12 +52,8 @@ bool Graphics::Initialize()
 // CPU에서 물체가 어떻게 움직일지 행렬 계산 후 GPU로 전송
 void Graphics::Update(float dt)
 {
-    static float rot = 0.f;
-    rot += dt;
     // 모델의 변환 행렬
-    m_constantBufferData.world = Matrix::CreateScale(0.5f)
-        * Matrix::CreateRotationY(rot) 
-        * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
+    m_constantBufferData.world = Matrix::CreateScale(0.5f) * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
     m_constantBufferData.world = m_constantBufferData.world.Transpose(); // Row-Major -> Column-Major 변환
 
@@ -133,7 +134,10 @@ void Graphics::Render()
     m_context->PSSetShader(m_pixelShader.Get(), 0, 0);
     
     // Rasterizer State 설정
-    m_context->RSSetState(m_rasterizerState.Get());
+    if (m_wireFrame) // 
+        m_context->RSSetState(m_WireRasterizerState.Get());
+    else
+        m_context->RSSetState(m_SolidRasterizerState.Get());
 
     // Vertex/Index Buffer 설정
     UINT stride = sizeof(Vertex);
@@ -145,7 +149,7 @@ void Graphics::Render()
     m_context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
     m_context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
-    // Index Buffer가 가진 Vertex들의 연결관계 설정
+    // Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
     m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 3개씩 묶어서 삼각형
     
     // GPU가 준비되면 Render 시작
@@ -155,5 +159,6 @@ void Graphics::Render()
 
 void Graphics::UpdateGUI()
 {
+    ImGui::Checkbox("WireFrame", &m_wireFrame);
     ImGui::Checkbox("usePerspectiveProjection", &m_usePerspectiveProjection);
 }

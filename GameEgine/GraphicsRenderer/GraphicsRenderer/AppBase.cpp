@@ -1,32 +1,20 @@
 #include "AppBase.h"
 #include <iostream>
 
-// 전역 변수로 선언해 이벤트 등의 메시지를 처리
-AppBase* appBase = nullptr;
-
 // imgui_impl_wind32에 정의된 메시지 처리 함수
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam,
 	LPARAM lParam);
 
-
 // DispatchMessage 함수가 호출 
 // (hwnd = window 핸들, uMsg = 메시지 코드, wParam, lParam = 메시지와 관련된 추가 데이터)
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return appBase->MsgProc(hwnd, uMsg, wParam, lParam);
-}
-
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 AppBase::AppBase() : m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0),
-m_screenViewPort(D3D11_VIEWPORT()) // viewPort 지정
-{
-	appBase = this;
-}
+m_screenViewPort(D3D11_VIEWPORT()) {} // viewPort 지정 
+
 
 AppBase::~AppBase()
 {
-	appBase = nullptr;
-
 	// ImGUI Clear
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -280,7 +268,11 @@ bool AppBase::InitD3D()
 	rastDesc.FrontCounterClockwise = false; 
 
 	// RasterizerState 생성
-	m_device->CreateRasterizerState(&rastDesc, m_rasterizerState.GetAddressOf());
+	m_device->CreateRasterizerState(&rastDesc, m_SolidRasterizerState.GetAddressOf());
+
+	// WireFrame 용 RasterizerState 생성
+	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+	m_device->CreateRasterizerState(&rastDesc, m_WireRasterizerState.GetAddressOf());
 
 	// Depth Buffer 옵션 설정
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -378,7 +370,7 @@ bool AppBase::InitGUI()
 	return true;
 }
 
-LRESULT CALLBACK AppBase::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
 		return true;

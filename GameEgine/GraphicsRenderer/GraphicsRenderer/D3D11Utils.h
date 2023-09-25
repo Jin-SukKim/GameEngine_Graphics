@@ -121,10 +121,11 @@ inline void D3D11Utils::UpdateBuffer(ComPtr<ID3D11DeviceContext>& context, const
 
 	// CPU 데이터 -> GPU 버퍼로 전송
 	D3D11_MAPPED_SUBRESOURCE ms;
+	// Map을 하면 CPU의 메모리와 GPU의 메모리를 대응시켜준다.
 	// 매핑할 버퍼 설정 (일종의 Lock 함수로 다른 프로세스 접근 제한)
 	context->Map(buffer.Get(), NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
 	// GPU 메모리에 데이터 카피
 	memcpy(ms.pData, &bufferData, sizeof(bufferData));
-	// 매핑 해제 (일종의 UnLock)
+	// 매핑 해제 (일종의 UnLock) - GPU 메모리 닫기
 	context->Unmap(buffer.Get(), NULL);
 }

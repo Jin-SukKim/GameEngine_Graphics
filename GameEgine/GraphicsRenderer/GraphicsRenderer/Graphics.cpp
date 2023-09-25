@@ -12,8 +12,10 @@ bool Graphics::Initialize()
     // Circle 생성
     {
         // Geometry 정의
-        MeshData mesh = GeometryGenerator::MakeGrid(2.0f, 2.0f, 10, 10);
-
+        MeshData mesh = GeometryGenerator::MakeSphere(1.5f, 5, 5);
+        // subdivision
+        mesh = GeometryGenerator::SubdivideToSphere(1.5f, mesh);
+        
         // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
         D3D11Utils::CreateVertexBuffer(m_device, mesh.vertices, m_vertexBuffer);
 

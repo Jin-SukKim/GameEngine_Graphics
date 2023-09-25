@@ -30,7 +30,7 @@ void D3D11Utils::CreateVSAndInputLayout(ComPtr<ID3D11Device>& device, const std:
 		filename.c_str(),	// Shader File Name
 		0,					// macro
 		0,					// shader에 Include 넣어줄 때 사용 (D3D_COMPILE_STANDARD_FILE_INCLUDE)
-		"VSmain",			// Shader의 entryPoint
+		"vsMain",			// Shader의 entryPoint
 		"vs_5_0",			// Shader version
 		0,		// Compile option
 		0,					// Compile Option (주로 0 사용)
@@ -72,7 +72,7 @@ void D3D11Utils::CreatePS(ComPtr<ID3D11Device>& device, const std::wstring& file
 #endif
 
 	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(), 0, 0, "PSmain", "ps_5_0", compileFlags, 0,
+		filename.c_str(), 0, 0, "psMain", "ps_5_0", compileFlags, 0,
 		&shaderBlob, &errorBlob);
 
 	CheckResult(hr, errorBlob.Get());

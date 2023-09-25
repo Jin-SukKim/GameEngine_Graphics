@@ -1,3 +1,4 @@
+#pragma once
 #include "D3D11Utils.h"
 
 // windows

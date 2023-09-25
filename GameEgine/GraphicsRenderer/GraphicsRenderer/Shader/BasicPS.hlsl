@@ -6,7 +6,7 @@ struct VSOutput
     float2 texcoord : TEXCOORD;
 };
 
-float4 PSmain(VSOutput input) : SV_Target
+float4 psMain(VSOutput input) : SV_Target
 {
     return float4(input.color, 1.0);
 }

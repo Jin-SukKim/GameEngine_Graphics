@@ -10,7 +10,7 @@ using DirectX::SimpleMath::Matrix;
 // 16 byte 단위 (float 4개) 단위로 전송
 // Matrix = XMFLOAT4 = float 4개
 struct MeshConstData {
-	Matrix world;
-	Matrix view;
-	Matrix proj;
+	Matrix world;	// Model을 world space 좌표로 변환
+	Matrix view;	// View 좌표계로 변환
+	Matrix proj;	// Projection 좌표계로 변환
 };

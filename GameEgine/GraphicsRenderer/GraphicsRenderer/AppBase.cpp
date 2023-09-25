@@ -12,7 +12,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 AppBase::AppBase() : m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0),
 m_screenViewPort(D3D11_VIEWPORT()) {} // viewPort 지정 
 
-
 AppBase::~AppBase()
 {
 	// ImGUI Clear
@@ -66,10 +65,10 @@ int AppBase::Run()
 			ImGui::End(); // 기록종료
 			ImGui::Render(); 
 			
-			// Game Update
+			// Game Update - Rendering할 데이터를 업데이트
 			Update(ImGui::GetIO().DeltaTime);
 
-			// DirectX Rendering
+			// DirectX Rendering - 업데이트한 데이터로 메모리에 Rendering
 			Render();
 
 			// GUI Rendering
@@ -83,6 +82,7 @@ int AppBase::Run()
 			}
 
 			// GUI 렌더링 후 Present() 호출
+			// 그린 Memory인 Back-buffer와 Front-Buffer를 swap해 화면에 출력
 			m_swapChain->Present(1, 0); // swap-chain의 두 버퍼 swap
 		}
 	}

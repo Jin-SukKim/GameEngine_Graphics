@@ -25,7 +25,7 @@ struct PSInput
     float2 texcoord : TEXCOORD;
 };
 
-PSInput VSmain(VSInput input)
+PSInput vsMain(VSInput input)
 {
     PSInput output;
     

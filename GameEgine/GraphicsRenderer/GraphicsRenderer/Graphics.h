@@ -4,8 +4,6 @@
 #include <vector>
 
 #include "ConstantData.h"
-#include "Vertex.h"
-
 
 class Graphics : public AppBase {
 public:

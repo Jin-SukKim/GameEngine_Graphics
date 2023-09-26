@@ -203,6 +203,7 @@
     <ClCompile Include="ImGUI\imgui_tables.cpp" />
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppBase.h" />
@@ -223,6 +224,7 @@
     <ClInclude Include="ImGUI\imstb_truetype.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="MeshData.h" />
+    <ClInclude Include="MeshModel.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

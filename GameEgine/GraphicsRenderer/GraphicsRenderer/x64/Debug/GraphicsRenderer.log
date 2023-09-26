@@ -1,2 +1,7 @@
-﻿  GeometryGenerator.cpp
-  GraphicsRenderer.vcxproj -> C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\GraphicsRenderer.exe
+﻿  Graphics.cpp
+  main.cpp
+  MeshModel.cpp
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\MeshModel.cpp(11,14): error C2672: 'D3D11Utils::CreateConstantBuffer': no matching overloaded function found
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\D3D11Utils.h(48,14): message : could be 'void D3D11Utils::CreateConstantBuffer(Microsoft::WRL::ComPtr<ID3D11Device> &,const T_CONSTANT &,Microsoft::WRL::ComPtr<ID3D11Buffer> &)'
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\MeshModel.cpp(11,35): message : 'initializing': cannot convert from 'Microsoft::WRL::ComPtr<ID3D11DeviceContext>' to 'Microsoft::WRL::ComPtr<ID3D11Device> &'
+  Generating Code...

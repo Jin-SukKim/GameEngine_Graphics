@@ -1,9 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include <wrl.h>
 
 #include <d3d11.h>
 
+#include "Mesh.h"
 #include "MeshData.h"
 #include "ConstantData.h"
 
@@ -13,14 +16,17 @@ class MeshModel {
 public:
 	// 생성한 MeshData를 가지고 와서 버퍼에 초기화
 	void Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh);
-	void Render(ComPtr<ID3D11DeviceContext>* context);
+	void Render(ComPtr<ID3D11DeviceContext>& context);
 	void UpdateConstantBuffers(ComPtr<ID3D11DeviceContext>& context);
 
 public:
 	// Constant Data
-	MeshConstData m_constantBufferData;
+	MeshConstData m_constantVSBufferData;
 
 private:
+	// Mesh
+	Mesh m_mesh = {};
+
 	// Shader
 	ComPtr<ID3D11VertexShader> m_meshVertexShader;
 	ComPtr<ID3D11PixelShader> m_meshPixelShader;

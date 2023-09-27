@@ -1,6 +1,6 @@
 #include "Graphics.h"
 #include "GeometryGenerator.h"
-Graphics::Graphics() : AppBase(), m_indexCount(0)
+Graphics::Graphics() : AppBase()
 {
 }
 
@@ -12,41 +12,11 @@ bool Graphics::Initialize()
     // Circle 생성
     {
         // Geometry 정의
-        MeshData mesh = GeometryGenerator::MakeSphere(1.5f, 5, 5);
+        MeshData sphere = GeometryGenerator::MakeSphere(1.5f, 5, 5);
         // subdivision
-        mesh = GeometryGenerator::SubdivideToSphere(1.5f, mesh);
-        
-        // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
-        D3D11Utils::CreateVertexBuffer(m_device, mesh.vertices, m_vertexBuffer);
-
-        // Index Buffer 생성 후 CPU -> GPU 데이터 복사
-        m_indexCount = UINT(mesh.indices.size());
-        D3D11Utils::CreateIndexBuffer(m_device, mesh.indices, m_indexBuffer);
+        sphere = GeometryGenerator::SubdivideToSphere(1.5f, sphere);
+        m_mesh.Initialize(m_device, sphere);
     }
-
-    // 변환 정의할 때 사용할 Buffer
-    m_constantBufferData.world = Matrix();      // World 행렬
-    m_constantBufferData.view = Matrix();       // View 행렬
-    m_constantBufferData.proj = Matrix(); // Projection 행렬
-    D3D11Utils::CreateConstantBuffer(m_device, m_constantBufferData, m_constantBuffer);
-
-    // Shader 생성
-    
-    // InputLayout의 데이터 형식으로 Vertex에 들어가는 데이터 구조체와 같게 설정
-    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        // COLOR가 시작되는 위치로 POSITION이 RGB 각각 4 byte씩 할당한 다음부터 시작하므로 4(byte) * 3(개수)
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3 + 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 9, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-
-    // InputLayout & Vertex Shader 생성
-    D3D11Utils::CreateVSAndInputLayout(m_device, L"Shader/BasicVS.hlsl", inputElements,
-        m_vertexShader, m_inputLayout);
-
-    // Pixel Shader 생성
-    D3D11Utils::CreatePS(m_device, L"Shader/BasicPS.hlsl", m_pixelShader);
 
 	return true;
 }
@@ -55,16 +25,17 @@ bool Graphics::Initialize()
 void Graphics::Update(float dt)
 {
     // 모델의 변환 행렬
-    m_constantBufferData.world = Matrix::CreateScale(0.5f) * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
+    Matrix world = Matrix::CreateScale(0.5f) * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
-    m_constantBufferData.world = m_constantBufferData.world.Transpose(); // Row-Major -> Column-Major 변환
+    m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
     // 시점 변환 - 원리 = 시점이 움직이는 반대로 세상의 모든 모델을 움직인다.
-    m_constantBufferData.view =
+    Matrix view =
         // (카메라 위치, 보는 방향, 카메라의 upVector)
         DirectX::XMMatrixLookAtLH({ 0.0f, 0.0f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f });
-    m_constantBufferData.view = m_constantBufferData.view.Transpose();
+    m_mesh.m_constantVSBufferData.view = view.Transpose();
 
+    Matrix proj;
     // 투영 행렬
     const float aspect = AppBase::GetAspectRatio();
     if (m_usePerspectiveProjection)
@@ -72,21 +43,20 @@ void Graphics::Update(float dt)
         // 시야각
         const float fovAngleY = 70.f * DirectX::XM_PI / 180.f;
         // 원근 투영
-        m_constantBufferData.proj =
+        proj =
             // (시야각, 화면비율, Near-Plane, Far-Plane)
             DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspect, 0.01f, 100.f);
     }
     else
     {
         // 정투영
-        m_constantBufferData.proj =
+        proj =
             // (x 방향 범위 변수 2개, y 방향 범위 변수 2개, Near-Plane, Far-Plane)
             DirectX::XMMatrixOrthographicOffCenterLH(-aspect, aspect, -1.0f, 1.0f, 0.1f, 10.0f);
     }
-    m_constantBufferData.proj = m_constantBufferData.proj.Transpose();
+    m_mesh.m_constantVSBufferData.proj = proj.Transpose();
 
-    // Constant Buffer Data를 CPU -> GPU 복사
-    D3D11Utils::UpdateBuffer(m_context, m_constantBufferData, m_constantBuffer);
+    m_mesh.UpdateConstantBuffers(m_context);
 }
 
 void Graphics::Render()
@@ -117,46 +87,14 @@ void Graphics::Render()
     
     // Depth/Stencil State 설정
     m_context->OMSetDepthStencilState(m_depthStencilState.Get(), 0); // 기본 state
-
-    // Vertex Shader 설정
-    m_context->VSSetShader(m_vertexShader.Get(), 0, 0);
-
-    /*
-        // 여러 constant buffer 사용시 
-        ID3D11Buffer *pptr[1] = {
-            m_constantBuffer.Get(),
-        };
-        m_context->VSSetConstantBuffers(0, 1, pptr);
-    */ 
-    // Vertex Shader의 Constant Buffer 설정
-    // (0번 index부터 시작, 1개, constant buffer)
-    m_context->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
-
-    // Pixel Shader 설정
-    m_context->PSSetShader(m_pixelShader.Get(), 0, 0);
     
     // Rasterizer State 설정
     if (m_wireFrame) // 
         m_context->RSSetState(m_WireRasterizerState.Get());
     else
         m_context->RSSetState(m_SolidRasterizerState.Get());
-
-    // Vertex/Index Buffer 설정
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
     
-    // Input Layout 설정
-    m_context->IASetInputLayout(m_inputLayout.Get());
-    // Vertex/Index Buffer 설정
-    m_context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-    m_context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-
-    // Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
-    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 3개씩 묶어서 삼각형
-    
-    // GPU가 준비되면 Render 시작
-    // (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
-    m_context->DrawIndexed(m_indexCount, 0, 0);
+    m_mesh.Render(m_context);
 }
 
 void Graphics::UpdateGUI()

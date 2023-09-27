@@ -36,6 +36,7 @@ PSInput vsMain(VSInput input)
     
     output.posProj = pos;
     output.color = input.color;
+    output.texcoord = input.texcoord;
     
     return output;
 }

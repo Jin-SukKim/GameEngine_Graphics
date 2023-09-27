@@ -3,7 +3,7 @@
 #include "AppBase.h"
 #include <vector>
 
-#include "ConstantData.h"
+#include "MeshModel.h"
 
 class Graphics : public AppBase {
 public:
@@ -15,18 +15,7 @@ public:
 	virtual void UpdateGUI() override;
 
 protected:
-	// Shaders
-	ComPtr<ID3D11VertexShader> m_vertexShader;
-	ComPtr<ID3D11PixelShader> m_pixelShader;
-	ComPtr<ID3D11InputLayout> m_inputLayout;
-
-	// Buffers
-	ComPtr<ID3D11Buffer> m_vertexBuffer;
-	ComPtr<ID3D11Buffer> m_indexBuffer;
-	ComPtr<ID3D11Buffer> m_constantBuffer;
-	UINT m_indexCount;
-
-	MeshConstData m_constantBufferData;
+	MeshModel m_mesh;
 
 	// ImGUI parameters
 	// 원근 투영을 사용할 것인지

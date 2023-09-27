@@ -113,6 +113,7 @@ bool AppBase::InitWindow()
 		NULL
 	};
 
+
 	// 운영 체제에 window 클래스 등록
 	if (!RegisterClassEx(&wc))
 	{

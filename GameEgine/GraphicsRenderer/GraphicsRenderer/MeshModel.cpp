@@ -6,12 +6,13 @@
 
 void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 {
+	m_mesh = std::make_shared<Mesh>();
 	// VertexBuffer 생성 후 CPU -> GPU 데이터 복사
-	D3D11Utils::CreateVertexBuffer(device, mesh.vertices, m_mesh.vertexBuffer);
+	D3D11Utils::CreateVertexBuffer(device, mesh.vertices, m_mesh->vertexBuffer);
 	// Index Buffer 생성 후 CPU -> GPU 데이터 복사
-	D3D11Utils::CreateIndexBuffer(device, mesh.indices, m_mesh.indexBuffer);
+	D3D11Utils::CreateIndexBuffer(device, mesh.indices, m_mesh->indexBuffer);
 	// Index Count 복사
-	m_mesh.indexCount = (UINT)mesh.indices.size();
+	m_mesh->indexCount = (UINT)mesh.indices.size();
 
 	// Constant Buffer 생성
 	m_constantVSBufferData.world = Matrix(); // World 행렬
@@ -74,15 +75,15 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	// Input Layout 설정
 	context->IASetInputLayout(m_meshInputLayout.Get());
 	// Vertex/Index Buffer 설정
-	context->IASetVertexBuffers(0, 1, m_mesh.vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(m_mesh.indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	context->IASetVertexBuffers(0, 1, m_mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+	context->IASetIndexBuffer(m_mesh->indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
 
 	// Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // index 3개씩 묶어서 삼각형 만들기
 
 	// GPU가 준비되면 Render
 	// (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
-	context->DrawIndexed(m_mesh.indexCount, 0, 0);
+	context->DrawIndexed(m_mesh->indexCount, 0, 0);
 
 }
 

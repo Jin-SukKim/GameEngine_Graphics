@@ -25,7 +25,7 @@ public:
 
 private:
 	// Mesh
-	Mesh m_mesh = {};
+	std::shared_ptr<Mesh> m_mesh;
 
 	// Shader
 	ComPtr<ID3D11VertexShader> m_meshVertexShader;

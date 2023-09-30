@@ -25,7 +25,11 @@ bool Graphics::Initialize()
 void Graphics::Update(float dt)
 {
     // 모델의 변환 행렬
-    Matrix world = Matrix::CreateScale(0.5f) * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
+    Matrix world = Matrix::CreateScale(m_scale)
+        * Matrix::CreateRotationX(m_rotationX)
+        * Matrix::CreateRotationY(m_rotationY)
+        * Matrix::CreateRotationZ(m_rotationZ)
+        * Matrix::CreateTranslation(Vector3(m_tranlationX, m_tranlationY, m_tranlationZ));
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
     m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
@@ -101,4 +105,15 @@ void Graphics::UpdateGUI()
 {
     ImGui::Checkbox("WireFrame", &m_wireFrame);
     ImGui::Checkbox("usePerspectiveProjection", &m_usePerspectiveProjection);
+
+    ImGui::SliderFloat("Scale", &m_scale, -50.f, 50.f);
+    
+    ImGui::SliderFloat("Traslation X", &m_tranlationX, -50.f, 50.f);
+    ImGui::SliderFloat("Traslation Y", &m_tranlationY, -50.f, 50.f);
+    ImGui::SliderFloat("Traslation Z", &m_tranlationZ, -50.f, 50.f);
+    
+    ImGui::SliderFloat("Rotation X", &m_rotationX, -50.f, 50.f);
+    ImGui::SliderFloat("Rotation Y", &m_rotationY, -50.f, 50.f);
+    ImGui::SliderFloat("Rotation Z", &m_rotationZ, -50.f, 50.f);
+
 }

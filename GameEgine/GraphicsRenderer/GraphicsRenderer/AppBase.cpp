@@ -1,6 +1,8 @@
 #include "AppBase.h"
 #include <iostream>
 
+#include <omp.h> // 가속
+
 // imgui_impl_wind32에 정의된 메시지 처리 함수
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam,
 	LPARAM lParam);

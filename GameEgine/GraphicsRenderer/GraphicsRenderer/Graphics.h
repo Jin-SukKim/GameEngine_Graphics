@@ -21,4 +21,15 @@ protected:
 	// 원근 투영을 사용할 것인지
 	bool m_usePerspectiveProjection = true;
 	bool m_wireFrame = false;
+	
+	float m_scale = 1.f;
+
+	float m_rotationX = 0.f;
+	float m_rotationY = 0.f;
+	float m_rotationZ = 1.f;
+
+	float m_tranlationX = 0.f;
+	float m_tranlationY = 0.f;
+	float m_tranlationZ = 0.f;
+
 };

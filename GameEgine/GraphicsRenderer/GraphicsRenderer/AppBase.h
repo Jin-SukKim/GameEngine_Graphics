@@ -1,5 +1,6 @@
 #pragma once
 #include "D3D11Utils.h"
+#include "Camera.h"
 
 // windows
 #include <windows.h>
@@ -46,6 +47,9 @@ public:
 	virtual bool Initialize();
 	int Run();
 
+	void OnMouseMove(int mouseX, int mouseY);
+	virtual LRESULT CALLBACK AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	float GetAspectRatio() const;
 
 	// Pure Virtual Function이기에 자식클래스의 함수 실행
@@ -79,4 +83,9 @@ public:
 	ComPtr<ID3D11DepthStencilState> m_depthStencilState;
 
 	D3D11_VIEWPORT m_screenViewPort;
+
+	Camera m_camera;
+
+	// 눌린 키보드 입력 상태
+	bool m_keyPressed[256] = { false, };
 };

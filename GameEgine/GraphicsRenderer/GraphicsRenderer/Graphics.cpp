@@ -1,5 +1,8 @@
 #include "Graphics.h"
 #include "GeometryGenerator.h"
+
+#include <directxtk/SimpleMath.h>
+
 Graphics::Graphics() : AppBase()
 {
 }
@@ -24,40 +27,19 @@ bool Graphics::Initialize()
 // CPU에서 물체가 어떻게 움직일지 행렬 계산 후 GPU로 전송
 void Graphics::Update(float dt)
 {
+    using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
+    Quaternion q = Quaternion::CreateFromYawPitchRoll(Vector3(m_rotationX, m_rotationY, m_rotationZ));
     Matrix world = Matrix::CreateScale(m_scale)
-        * Matrix::CreateRotationX(m_rotationX)
-        * Matrix::CreateRotationY(m_rotationY)
-        * Matrix::CreateRotationZ(m_rotationZ)
+        * Matrix::CreateFromQuaternion(q)
         * Matrix::CreateTranslation(Vector3(m_tranlationX, m_tranlationY, m_tranlationZ));
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
     m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
-    // 시점 변환 - 원리 = 시점이 움직이는 반대로 세상의 모든 모델을 움직인다.
-    Matrix view =
-        // (카메라 위치, 보는 방향, 카메라의 upVector)
-        DirectX::XMMatrixLookAtLH({ 0.0f, 0.0f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f });
+    Matrix view = m_camera.GetFocusViewRowMatrix();
     m_mesh.m_constantVSBufferData.view = view.Transpose();
 
-    Matrix proj;
-    // 투영 행렬
-    const float aspect = AppBase::GetAspectRatio();
-    if (m_usePerspectiveProjection)
-    {
-        // 시야각
-        const float fovAngleY = 70.f * DirectX::XM_PI / 180.f;
-        // 원근 투영
-        proj =
-            // (시야각, 화면비율, Near-Plane, Far-Plane)
-            DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspect, 0.01f, 100.f);
-    }
-    else
-    {
-        // 정투영
-        proj =
-            // (x 방향 범위 변수 2개, y 방향 범위 변수 2개, Near-Plane, Far-Plane)
-            DirectX::XMMatrixOrthographicOffCenterLH(-aspect, aspect, -1.0f, 1.0f, 0.1f, 10.0f);
-    }
+    Matrix proj = m_camera.GetProjRowMatrix();
     m_mesh.m_constantVSBufferData.proj = proj.Transpose();
 
     m_mesh.UpdateConstantBuffers(m_context);
@@ -106,14 +88,13 @@ void Graphics::UpdateGUI()
     ImGui::Checkbox("WireFrame", &m_wireFrame);
     ImGui::Checkbox("usePerspectiveProjection", &m_usePerspectiveProjection);
 
-    ImGui::SliderFloat("Scale", &m_scale, -50.f, 50.f);
+    ImGui::SliderFloat("Scale", &m_scale, -10.f, 10.f);
     
-    ImGui::SliderFloat("Traslation X", &m_tranlationX, -50.f, 50.f);
-    ImGui::SliderFloat("Traslation Y", &m_tranlationY, -50.f, 50.f);
-    ImGui::SliderFloat("Traslation Z", &m_tranlationZ, -50.f, 50.f);
+    ImGui::SliderFloat("Traslation X", &m_tranlationX, -5.f, 5.f);
+    ImGui::SliderFloat("Traslation Y", &m_tranlationY, -5.f, 5.f);
+    ImGui::SliderFloat("Traslation Z", &m_tranlationZ, -5.f, 5.f);
     
-    ImGui::SliderFloat("Rotation X", &m_rotationX, -50.f, 50.f);
-    ImGui::SliderFloat("Rotation Y", &m_rotationY, -50.f, 50.f);
-    ImGui::SliderFloat("Rotation Z", &m_rotationZ, -50.f, 50.f);
-
+    ImGui::SliderFloat("Rotation X", &m_rotationX, -3.14f, 3.14f);
+    ImGui::SliderFloat("Rotation Y", &m_rotationY, -3.14f, 3.14f);
+    ImGui::SliderFloat("Rotation Z", &m_rotationZ, -3.14f, 3.14f);
 }

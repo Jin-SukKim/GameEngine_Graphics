@@ -1,7 +1,12 @@
 #include "AppBase.h"
 #include <iostream>
+#include <algorithm>
 
 #include <omp.h> // 가속
+
+// 클래스 멤버 함수에서 간접적으로 윈도우 메시지를
+// 처리할 수 있도록 선언
+AppBase* app = nullptr;
 
 // imgui_impl_wind32에 정의된 메시지 처리 함수
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam,
@@ -9,13 +14,22 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 // DispatchMessage 함수가 호출 
 // (hwnd = window 핸들, uMsg = 메시지 코드, wParam, lParam = 메시지와 관련된 추가 데이터)
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return app->AppProc(hwnd, uMsg, wParam, lParam);
+}
 
 AppBase::AppBase() : m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0),
-m_screenViewPort(D3D11_VIEWPORT()) {} // viewPort 지정 
+m_screenViewPort(D3D11_VIEWPORT()) { // viewPort 지정 
+
+	app = this;
+
+	m_camera.SetAspectRatio(GetAspectRatio());
+} 
 
 AppBase::~AppBase()
 {
+	app = nullptr;
+
 	// ImGUI Clear
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
@@ -89,6 +103,69 @@ int AppBase::Run()
 		}
 	}
 	return 0;
+}
+
+void AppBase::OnMouseMove(int mouseX, int mouseY)
+{
+	// 윈도우의 마우스 위치 범위는 좌측 상단이 (0, 0), 우측 하단이 (width - 1, height -1)이다.
+	// 이걸 NDC 좌표 범위로 변환시켜 사용한다. 
+	// NDC 좌표는 좌측 상단 (-1, 1), 우측 하단이 (1, -1)이다.
+	float x = (float)mouseX * 2 / m_screenWidth - 1.f;
+	float y = -(float)mouseY * 2 / m_screenHeight + 1.f;
+
+	// 범위 밖으로 나가지 않도록 clamp
+	x = std::clamp(x, -1.f, 1.f);
+	y = std::clamp(y, -1.f, 1.f);
+
+	std::cout << x << ' ' << y << '\n';
+}
+
+LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
+		return true;
+
+	switch (uMsg)
+	{
+	case WM_SIZE:
+		// Reset and resize swapchain
+		break;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+			return 0;
+		break;
+	case WM_MOUSEMOVE:
+		//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
+		OnMouseMove(LOWORD(lParam), HIWORD(lParam));
+		
+		break;
+	case WM_LBUTTONUP:
+		// cout << "WM_LBUTTONUP Left mouse button" << endl;
+		break;
+	case WM_RBUTTONUP:
+		// cout << "WM_RBUTTONUP Right mouse button" << endl;
+		break;
+	case WM_KEYDOWN:
+		// ESC 누르면 프로그램 종료
+		if (wParam == 27)
+			DestroyWindow(m_mainWindow);
+
+		// 키보드가 눌린 상태 저장
+		m_keyPressed[wParam] = true;
+
+		// cout << "WM_KEYDOWN " << (int)wParam << endl;
+		break;
+	case WM_KEYUP:
+		// 키보드가 더이상 안눌리면
+		m_keyPressed[wParam] = false;
+		break;
+	case WM_DESTROY:
+		::PostQuitMessage(0);
+		return 0;
+	}
+
+	// 기본 메시지 처리 (특정 메시지를 처리하지 않는 경우)
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 float AppBase::GetAspectRatio() const
@@ -369,41 +446,5 @@ bool AppBase::InitGUI()
 	if (!ImGui_ImplDX11_Init(m_device.Get(), m_context.Get()))
 		return false;
 
-
 	return true;
-}
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
-		return true;
-
-	switch (uMsg)
-	{
-	case WM_SIZE:
-		// Reset and resize swapchain
-		break;
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-			return 0;
-		break;
-	case WM_MOUSEMOVE:
-		// cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << endl;
-		break;
-	case WM_LBUTTONUP:
-		// cout << "WM_LBUTTONUP Left mouse button" << endl;
-		break;
-	case WM_RBUTTONUP:
-		// cout << "WM_RBUTTONUP Right mouse button" << endl;
-		break;
-	case WM_KEYDOWN:
-		// cout << "WM_KEYDOWN " << (int)wParam << endl;
-		break;
-	case WM_DESTROY:
-		::PostQuitMessage(0);
-		return 0;
-	}
-
-	// 기본 메시지 처리 (특정 메시지를 처리하지 않는 경우)
-	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

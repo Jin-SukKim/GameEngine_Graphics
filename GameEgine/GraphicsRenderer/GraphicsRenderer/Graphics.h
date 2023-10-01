@@ -22,14 +22,14 @@ protected:
 	bool m_usePerspectiveProjection = true;
 	bool m_wireFrame = false;
 	
-	float m_scale = 1.f;
+	Vector3 modelAxis = {1.f, 0.f, 0.f};
+	float m_scale = 0.3f;
 
 	float m_rotationX = 0.f;
 	float m_rotationY = 0.f;
-	float m_rotationZ = 1.f;
+	float m_rotationZ = 0.f;
 
 	float m_tranlationX = 0.f;
 	float m_tranlationY = 0.f;
 	float m_tranlationZ = 0.f;
-
 };

@@ -15,9 +15,10 @@ bool Graphics::Initialize()
     // Circle 생성
     {
         // Geometry 정의
-        MeshData sphere = GeometryGenerator::MakeSphere(1.5f, 5, 5);
+        //MeshData sphere = GeometryGenerator::MakeSphere(1.5f, 5, 5);
+        MeshData sphere = GeometryGenerator::MakeCube();
         // subdivision
-        sphere = GeometryGenerator::SubdivideToSphere(1.5f, sphere);
+        //sphere = GeometryGenerator::SubdivideToSphere(1.5f, sphere);
         m_mesh.Initialize(m_device, sphere);
     }
 
@@ -35,6 +36,9 @@ void Graphics::Update(float dt)
         * Matrix::CreateTranslation(Vector3(m_tranlationX, m_tranlationY, m_tranlationZ));
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
     m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
+
+    // 카메라의 이동
+    //UserInput(dt);
 
     Matrix view = m_camera.GetFocusViewRowMatrix();
     m_mesh.m_constantVSBufferData.view = view.Transpose();
@@ -97,4 +101,19 @@ void Graphics::UpdateGUI()
     ImGui::SliderFloat("Rotation X", &m_rotationX, -3.14f, 3.14f);
     ImGui::SliderFloat("Rotation Y", &m_rotationY, -3.14f, 3.14f);
     ImGui::SliderFloat("Rotation Z", &m_rotationZ, -3.14f, 3.14f);
+}
+
+void Graphics::UserInput(float dt)
+{
+    // 카메라의 이동
+    // 시간 간격에 비례해서 이동 (dt 사용)
+    if (m_keyPressed[87]) // w : 앞으로 이동
+        m_camera.MoveForward(dt);
+    if (m_keyPressed[83]) // s : 뒤으로 이동
+        m_camera.MoveForward(-dt);
+    if (m_keyPressed[68]) // d : 오른쪽으로 이동
+        m_camera.MoveRight(dt);
+    if (m_keyPressed[65]) // a : 왼쪽으로 이동
+        m_camera.MoveRight(-dt);
+
 }

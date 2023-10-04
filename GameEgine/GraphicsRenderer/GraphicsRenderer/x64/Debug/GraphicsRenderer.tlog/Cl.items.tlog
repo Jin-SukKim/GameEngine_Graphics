@@ -12,7 +12,5 @@ C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Camera.cpp;C:\Study
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\D3D11Utils.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\D3D11Utils.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\GeometryGenerator.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\GeometryGenerator.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Graphics.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\Graphics.obj
-C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Image.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\Image.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\main.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\main.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\MeshModel.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\MeshModel.obj
-C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Texture.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\Texture.obj

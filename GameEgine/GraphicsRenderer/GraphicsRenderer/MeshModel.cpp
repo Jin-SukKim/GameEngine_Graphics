@@ -20,6 +20,23 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 	m_constantVSBufferData.proj = Matrix(); // Projection 행렬
 	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
 
+	// Texture Sampler 설정
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	// Filtering은 Linear Interpolation으로 설정
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	// wrap/crap/mirror 등 옵션 설정 가능
+	// Texture도 2D Texture, 3D Textrue가 있기 때문에 W 좌표까지 사용 가능
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; // x
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP; // y
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP; // z
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	// Sampler State 생성
+	device->CreateSamplerState(&sampDesc, m_mesh->m_samplerState.GetAddressOf());
+
 	// Shader 생성
 
 	// InputLayer의 데이터 형식으로 Vertex Shader에 들어가는 데이터 구조체와 같게 설정
@@ -54,9 +71,6 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 
 	// Vertex Shader 설정
 	context->VSSetShader(m_meshVertexShader.Get(), 0, 0);
-	// Pixel Shader 설정
-	context->PSSetShader(m_meshPixelShader.Get(), 0, 0);
-
 	/*
 		// 여러 constant buffer 사용시
 		ID3D11Buffer *pptr[1] = {
@@ -67,6 +81,20 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	// Constant Buffer 설정
 	// (0번 index부터 시작, 1개, constant buffer)
 	context->VSSetConstantBuffers(0, 1, m_meshVSConstantBuffer.GetAddressOf());
+
+	// Pixel Shader에 Texture와 Sampler를 넘겨준다.
+	// Texture Data는 TextureResourceView로 Shader에서 사용하는 Resource의
+	// 실질적 데이터가 들어가 있다.
+	// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
+	ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
+	{
+		m_mesh->m_TextureResourceView.Get()
+	};
+	// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
+	context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기
+	context->PSSetSamplers(0, 1, m_mesh->m_samplerState.GetAddressOf()); // Sampler 넘기기
+	// Pixel Shader 설정
+	context->PSSetShader(m_meshPixelShader.Get(), 0, 0);
 
 	// Vertex Buffer의 단위와 offset 설정
 	UINT stride = sizeof(Vertex);

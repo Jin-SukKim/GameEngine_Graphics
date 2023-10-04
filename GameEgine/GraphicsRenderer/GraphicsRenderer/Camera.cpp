@@ -1,5 +1,6 @@
 #include "Camera.h"
 
+#include <iostream>
 Matrix Camera::GetFPPViewRowMatrix()
 {
     // View 좌표계에서는 정면 방향이 +z, 오른쪽이 +x, 위쪽이 +y이다.
@@ -35,14 +36,32 @@ Matrix Camera::GetFocusViewRowMatrix(float focusDis)
 
 void Camera::MoveForward(float dt)
 {
+    // 컴퓨터마다 속도가 다르기에 시간값(delta time)을 곱해준다.
+    m_camPos += m_camDir * m_camSpeed * dt;
 }
 
+// TODO: right/left movement is weird (check it later)
 void Camera::MoveRight(float dt)
 {
+    m_camPos += m_camRight * m_camSpeed * dt;
 }
 
-void Camera::UpdateMouse(float mouseX, float mouseY)
+// TODO: Rotation doesn't work properly
+void Camera::MouseRotate(float mouseNdcX, float mouseNdcY)
 {
+    
+    // NDC좌표계 범위 [-1, 1]로 회전 반경 제한
+    m_yaw = mouseNdcX * m_sensitivityX; // 위/아래 회전
+    // mouseNdcY가 -값일 떄 아래로 회전하고 +면 위로 회전하려면
+    // -를 붙여서 저장해준다.
+    m_pitch = -mouseNdcY * m_sensitivityY; // 좌우 회전
+
+    Matrix rot = Matrix::CreateRotationX(m_pitch) * Matrix::CreateRotationY(m_yaw);
+    m_camDir = Vector3::Transform(m_camDir, rot);
+    m_camDir.Normalize();
+    m_camUp = Vector3::Transform(m_camUp, rot);
+    m_camUp.Normalize();
+    m_camRight = m_camUp.Cross(m_camDir);
 }
 
 void Camera::SetAspectRatio(float aspect)
@@ -50,12 +69,17 @@ void Camera::SetAspectRatio(float aspect)
     m_aspect = aspect;
 }
 
+void Camera::SetCameraSpeed(float speed)
+{
+    m_camSpeed = speed;
+}
+
 void Camera::SetFovAngle(float angle)
 {
     m_fovAngleY = angle;
 }
 
-void Camera::SetCameraTo(Vector3 pos, Vector3 dir, Vector3 up)
+void Camera::SetCamera(Vector3 pos, Vector3 dir, Vector3 up)
 {
     m_camPos = pos;
     m_camDir = dir;

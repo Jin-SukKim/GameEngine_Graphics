@@ -57,6 +57,14 @@ public:
 		const T_DATA& bufferData,
 		ComPtr<ID3D11Buffer>& buffer);
 
+	static void ReadImage(const char* filename, std::vector<uint8_t>& image, int& width, int& height);
+
+	// Texture 이미지 파일 읽어들여서 텍스처 메모리 생성
+	static void CreateTexture(
+		ComPtr<ID3D11Device>& device,
+		const std::string& filename,
+		ComPtr<ID3D11Texture2D>& texture,
+		ComPtr<ID3D11ShaderResourceView>& textureResourveView);
 };
 
 

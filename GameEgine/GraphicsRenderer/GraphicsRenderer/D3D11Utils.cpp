@@ -1,5 +1,11 @@
 #include "D3D11Utils.h"
 
+// 이미지 Lib
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 // https://learn.microsoft.com/en-us/windows/win32/direct3d11/how-to--compile-a-shader
 void CheckResult(HRESULT hr, ID3DBlob* errorBlob)
 {
@@ -97,4 +103,94 @@ void D3D11Utils::CreateIndexBuffer(ComPtr<ID3D11Device>& device, const std::vect
 	indexBufferData.SysMemSlicePitch = 0;
 
 	device->CreateBuffer(&bDesc, &indexBufferData, indexBuffer.GetAddressOf());
+}
+
+void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, int& width, int& height)
+{
+	// 이미지의 channel 개수
+	int channels;
+
+	// Image로부터 데이터 읽어오기
+	// 1차원처럼 이미지에서 데이터를 가져온다. (색의 범위는 [0, 255]이므로 8bit만 있으면 된다)
+	unsigned char* img =
+		stbi_load(filename, &width, &height, &channels, 0);
+
+	// 읽은 이미지 데이터 복사
+	image.resize(width * height * 4); // 4채널로 만들어서 복사 (RGBA)
+	// 맞는 채널에 따라 복사
+	switch (channels)
+	{
+	case 1:
+		for (size_t i = 0; i < width * height; i++)
+		{
+			uint8_t g = img[i * channels + 0];
+			for (size_t c = 0; c < 4; c++)
+				image[4 * i + c] = g;
+		}
+		break;
+	case 2:
+		for (size_t i = 0; i < width * height; i++)
+		{
+			for (size_t c = 0; c < 2; c++)
+				image[4 * i + c] = img[i * channels + c];
+			image[4 * i + 2] = img[i * channels + 2];
+			image[4 * i + 3] = img[i * channels + 3];
+
+		}
+		break;
+	case 3:
+		for (size_t i = 0; i < width * height; i++)
+		{
+			for (size_t c = 0; c < 3; c++)
+				image[4 * i + c] = img[i * channels + c];
+			image[4 * i + 3] = img[i * channels + 3];
+		}
+		break;
+	case 4:
+		for (size_t i = 0; i < width * height; i++)
+		{
+			for (size_t c = 0; c < 4; c++)
+				image[4 * i + c] = img[i * channels + c];
+		}
+		break;
+	default:
+		std::cout << "Cannot read " << channels << " channels\n";
+		break;
+	}
+
+	delete[] img;
+}
+
+void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& filename, ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& textureResourveView)
+{
+	// 이미지의 Data
+	int width = 0, height = 0;
+	// 일반적으로 사용하는 이미지 타입 (RGBA값 당 256이므로 8bit면 된다)
+	std::vector<uint8_t> image;
+
+	ReadImage(filename.c_str(), image, width, height);
+
+	// Texture 생성
+	D3D11_TEXTURE2D_DESC txtDesc = {};
+	txtDesc.Width = width;
+	txtDesc.Height = height;
+	txtDesc.MipLevels = txtDesc.ArraySize = 1;
+	// 이미지 파일을 읽어들인 Data를 가지고 Texture 생성 시 사용할 Format
+	txtDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	txtDesc.SampleDesc.Count = 1;
+	// 한 번 읽은 Texture Image를 다시 변형할 일은 없기에 immutable로 설정
+	txtDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	// Shader Resource로 사용 (RenderTarget으로 사용시 RenderTarget으로 설정)
+	txtDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	// Image의 데이터로 초기화 - Subresource Data를 설정
+	// Subresource는 resource내에 있는 실제 데이터를 의미 (Resource는 Subresource의 집합)
+	D3D11_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = image.data();
+	InitData.SysMemPitch = txtDesc.Width * txtDesc.Height * sizeof(uint8_t) * 4; // 4 채널 사용
+
+	// 읽어온 이미지 데이터를 사용해 Texture 생성
+	device->CreateTexture2D(&txtDesc, &InitData, texture.GetAddressOf());
+	// 생성한 Texture로 TextureResourceView 생성
+	device->CreateShaderResourceView(texture.Get(), nullptr, textureResourveView.GetAddressOf());
 }

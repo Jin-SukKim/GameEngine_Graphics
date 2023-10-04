@@ -85,6 +85,7 @@ public:
 	D3D11_VIEWPORT m_screenViewPort;
 
 	Camera m_camera;
+	float prevX = 0, prevY = 0;
 
 	// 눌린 키보드 입력 상태
 	bool m_keyPressed[256] = { false, };

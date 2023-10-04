@@ -41,12 +41,6 @@
     <ClCompile Include="MeshModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
@@ -104,12 +98,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MeshModel.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imconfig.h">

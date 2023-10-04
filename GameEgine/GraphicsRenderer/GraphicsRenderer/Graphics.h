@@ -14,6 +14,8 @@ public:
 	virtual void Render() override;
 	virtual void UpdateGUI() override;
 
+	void UserInput(float dt);
+
 protected:
 	MeshModel m_mesh;
 

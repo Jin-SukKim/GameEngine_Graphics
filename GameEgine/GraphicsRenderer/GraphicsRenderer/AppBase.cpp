@@ -113,11 +113,15 @@ void AppBase::OnMouseMove(int mouseX, int mouseY)
 	float x = (float)mouseX * 2 / m_screenWidth - 1.f;
 	float y = -(float)mouseY * 2 / m_screenHeight + 1.f;
 
-	// 범위 밖으로 나가지 않도록 clamp
-	x = std::clamp(x, -1.f, 1.f);
-	y = std::clamp(y, -1.f, 1.f);
+	// 범위 밖으로 나가지 않도록 clamp 
+	// 이전 좌표와의 차이
+	float gapX = std::clamp(x, -1.f, 1.f) - prevX;
+	float gapY = std::clamp(y, -1.f, 1.f) - prevY;
 
-	std::cout << x << ' ' << y << '\n';
+	prevX = x;
+	prevY = y;
+	// 카메라 시점 회전
+	//m_camera.MouseRotate(gapX, gapY);
 }
 
 LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

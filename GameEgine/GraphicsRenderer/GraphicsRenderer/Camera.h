@@ -7,17 +7,20 @@ using DirectX::SimpleMath::Matrix;
 // 시점 변환 - 원리 = 시점이 움직이는 반대로 세상의 모든 모델을 움직인다.
 class Camera {
 public:
+	Camera(Vector3 pos = { 0.0f, 0.0f, -3.f }, Vector3 lookAt = { 0.0f, 0.0f, 0.0f });
 	// 1인칭 시점 Control을 사용할 때 view 행렬
 	Matrix GetFPPViewRowMatrix();
 	// projection 행렬
 	Matrix GetProjRowMatrix();
 	// XMMatrixLookAtLH를 활용한 view 행렬 생성
-	Matrix GetFocusViewRowMatrix(float focusDis = 1.f);
+	Matrix GetFocusViewRowMatrix();
 	
 	// 카메라 앞/뒤 움직임
 	void MoveForward(float dt);
 	// 카메라 좌/우 움직임
 	void MoveRight(float dt);
+	// 카메라 상/하 움직임
+	void MoveUp(float dt);
 	// 마우스 움직임에 따른 카메라 회전
 	void MouseRotate(float mouseNdcX, float mouseNdcY);
 
@@ -27,8 +30,6 @@ public:
 	void SetCameraSpeed(float speed);
 	// 시야각 설정
 	void SetFovAngle(float angle);
-	// 카메라 위치, 방향, up vector 설정
-	void SetCamera(Vector3 pos, Vector3 dir, Vector3 up);
 	
 	// 카메라 위치
 	Vector3 GetCameraPos();
@@ -38,7 +39,9 @@ public:
 
 private:
 	// 월드 좌표계에서 카메라의 위치
-	Vector3 m_camPos = { 0.0f, 0.0f, -3.f };
+	Vector3 m_camPos;
+	// 카메라가 보는 위치
+	Vector3 m_camLookAt;
 	// 카메라 시점 방향 - 카메라가 보는 방향, 걸어가는 방향
 	Vector3 m_camDir = { 0.f, 0.f, 1.f };
 	// 카메라 up vector - 위쪽 방향, 중력의 반대방향이 기본

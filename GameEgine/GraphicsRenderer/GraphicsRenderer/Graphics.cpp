@@ -38,7 +38,7 @@ void Graphics::Update(float dt)
     m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
     // 카메라의 이동
-    //UserInput(dt);
+    UserInput(dt);
 
     Matrix view = m_camera.GetFocusViewRowMatrix();
     m_mesh.m_constantVSBufferData.view = view.Transpose();
@@ -115,5 +115,10 @@ void Graphics::UserInput(float dt)
         m_camera.MoveRight(dt);
     if (m_keyPressed[65]) // a : 왼쪽으로 이동
         m_camera.MoveRight(-dt);
+    if (m_keyPressed[69]) // d : 위로 이동
+        m_camera.MoveUp(dt);
+    if (m_keyPressed[81]) // a : 아래로 이동
+        m_camera.MoveUp(-dt);
+
 
 }

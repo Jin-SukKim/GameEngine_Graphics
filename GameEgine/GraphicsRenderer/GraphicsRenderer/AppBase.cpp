@@ -157,7 +157,7 @@ LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// 키보드가 눌린 상태 저장
 		m_keyPressed[wParam] = true;
 
-		// cout << "WM_KEYDOWN " << (int)wParam << endl;
+		//std::cout << "WM_KEYDOWN " << (int)wParam << std::endl;
 		break;
 	case WM_KEYUP:
 		// 키보드가 더이상 안눌리면

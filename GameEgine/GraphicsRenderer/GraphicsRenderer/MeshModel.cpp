@@ -37,6 +37,10 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 	// Sampler State 생성
 	device->CreateSamplerState(&sampDesc, m_mesh->m_samplerState.GetAddressOf());
 
+	// Texture 생성
+	D3D11Utils::CreateTexture(device, mesh.texturePath, 
+		m_mesh->m_meshTexture, m_mesh->m_textureResourceView);
+
 	// Shader 생성
 
 	// InputLayer의 데이터 형식으로 Vertex Shader에 들어가는 데이터 구조체와 같게 설정
@@ -88,7 +92,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
 	ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
 	{
-		m_mesh->m_TextureResourceView.Get()
+		m_mesh->m_textureResourceView.Get()
 	};
 	// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
 	context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기

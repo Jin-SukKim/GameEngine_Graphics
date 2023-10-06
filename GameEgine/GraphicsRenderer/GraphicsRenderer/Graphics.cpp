@@ -12,14 +12,12 @@ bool Graphics::Initialize()
 	if (!AppBase::Initialize())
 		return false;
 
-    // Circle 생성
+    // 기본 모델 생성
     {
         // Geometry 정의
-        //MeshData sphere = GeometryGenerator::MakeSphere(1.5f, 5, 5);
-        MeshData sphere = GeometryGenerator::MakeCube();
-        // subdivision
-        //sphere = GeometryGenerator::SubdivideToSphere(1.5f, sphere);
-        m_mesh.Initialize(m_device, sphere);
+        MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
+        square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
+        m_mesh.Initialize(m_device, square);
     }
 
 	return true;

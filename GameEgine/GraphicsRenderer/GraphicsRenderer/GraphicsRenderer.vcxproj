@@ -260,6 +260,9 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">vsMain</EntryPointName>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Commons.hlsli" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

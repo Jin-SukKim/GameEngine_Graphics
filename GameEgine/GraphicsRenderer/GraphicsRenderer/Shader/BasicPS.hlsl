@@ -13,6 +13,6 @@ struct VSOutput
 
 float4 psMain(VSOutput input) : SV_TARGET
 {
-    return float4(input.color, 1.0);
-    // return g_texture0.Sample(g_sampler0, input.texcoord);
+    //return float4(input.color, 1.0);
+    return g_texture0.Sample(g_sampler0, input.texcoord);
 }

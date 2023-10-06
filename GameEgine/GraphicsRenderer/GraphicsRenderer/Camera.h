@@ -7,7 +7,7 @@ using DirectX::SimpleMath::Matrix;
 // 시점 변환 - 원리 = 시점이 움직이는 반대로 세상의 모든 모델을 움직인다.
 class Camera {
 public:
-	Camera(Vector3 pos = { 0.0f, 0.0f, -3.f }, Vector3 lookAt = { 0.0f, 0.0f, 0.0f });
+	Camera(Vector3 pos = { 0.0f, 0.0f, -1.f }, Vector3 lookAt = { 0.0f, 0.0f, 0.0f });
 	// 1인칭 시점 Control을 사용할 때 view 행렬
 	Matrix GetFPPViewRowMatrix();
 	// projection 행렬

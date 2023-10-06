@@ -189,7 +189,7 @@ MeshData GeometryGenerator::MakeTriangle()
     return triangle;
 }
 
-MeshData GeometryGenerator::MakeSqaure()
+MeshData GeometryGenerator::MakeSquare()
 {
     std::vector<Vector3> pos;
     std::vector<Vector3> color;
@@ -307,13 +307,12 @@ MeshData GeometryGenerator::MakeGrid(const float& width, const float& height, co
 
             v.pos = Vector3::Transform(
                 // dx * i만큼 이동시킨 vertex의 위치
-                stack, Matrix::CreateTranslation(Vector3(dx * i, 0.f, 0.f))
+                stack, Matrix::CreateTranslation(Vector3(dx * (float)i, 0.f, 0.f))
             );
             v.normal = v.pos;
             v.normal.z = -1.f;
             v.color = Vector3(1.f, 1.f, 1.f);
             v.texcoord = Vector2((float)i / numSlices, 1.f - (float)j / numSlices);
-            
             grid.vertices.push_back(v);
         }
     }

@@ -1,5 +1,5 @@
 # 폴더 제외
 Assets/
-
+ipch/
 # 특정 파일 제외
 v17/Browse.VC.db

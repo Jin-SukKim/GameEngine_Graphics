@@ -118,6 +118,7 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 	// 읽은 이미지 데이터 복사
 	image.resize(width * height * 4); // 4채널로 만들어서 복사 (RGBA)
 	// 맞는 채널에 따라 복사
+
 	switch (channels)
 	{
 	case 1:
@@ -157,11 +158,11 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 		std::cout << "Cannot read " << channels << " channels\n";
 		break;
 	}
-
 	delete[] img;
 }
 
-void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& filename, ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& textureResourveView)
+void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& filename,
+	ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& textureResourceView)
 {
 	// 이미지의 Data
 	int width = 0, height = 0;
@@ -185,12 +186,13 @@ void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& 
 
 	// Image의 데이터로 초기화 - Subresource Data를 설정
 	// Subresource는 resource내에 있는 실제 데이터를 의미 (Resource는 Subresource의 집합)
-	D3D11_SUBRESOURCE_DATA InitData;
-	InitData.pSysMem = image.data();
-	InitData.SysMemPitch = txtDesc.Width * txtDesc.Height * sizeof(uint8_t) * 4; // 4 채널 사용
+	D3D11_SUBRESOURCE_DATA initData;
+	initData.pSysMem = image.data();
+	initData.SysMemPitch = txtDesc.Width * sizeof(uint8_t) * 4; // 4 채널 사용
 
 	// 읽어온 이미지 데이터를 사용해 Texture 생성
-	device->CreateTexture2D(&txtDesc, &InitData, texture.GetAddressOf());
+	device->CreateTexture2D(&txtDesc, &initData, texture.GetAddressOf());
 	// 생성한 Texture로 TextureResourceView 생성
-	device->CreateShaderResourceView(texture.Get(), nullptr, textureResourveView.GetAddressOf());
+	device->CreateShaderResourceView(texture.Get(), nullptr,
+		textureResourceView.GetAddressOf());
 }

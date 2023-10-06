@@ -11,7 +11,7 @@ public:
 	// 삼각형 생성
 	static MeshData MakeTriangle();
 	// 사각형 생성
-	static MeshData MakeSqaure();
+	static MeshData MakeSquare();
 	// 여러 삼각형으로 원 생성
 	static MeshData MakeCircle(const float& radius = 1.f, const int& numTriangles = 50, const Vector3& color = Vector3(1.f, 1.f, 1.f));
 	// Grid 생성

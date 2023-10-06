@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS,WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;UNICODE;NODEBUG;UNICODE;_UNICODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\GraphicsRenderer\Shader\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\ImGUI\backends\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Lib\ImGUI\backends\;$(SoluitionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Assets\;$(SolutionDir)\GraphicsRenderer\Shader\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\ImGUI\backends\;$(SolutionDir)\Lib\stb-master\;$(SoluitionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
@@ -172,7 +172,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS,NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;UNICODE;NODEBUG;UNICODE;_UNICODE</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\GraphicsRenderer\Shader\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\ImGUI\backends\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Lib\ImGUI\backends\;$(SoluitionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Assets\;$(SolutionDir)\GraphicsRenderer\Shader\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\ImGUI\backends\;$(SolutionDir)\Lib\stb-master\;$(SoluitionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>

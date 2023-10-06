@@ -36,7 +36,6 @@ Camera::Camera(Vector3 pos, Vector3 lookAt) : m_camPos(pos), m_camLookAt(lookAt)
     m_usePerspectiveProjection = true;
 }
 
-// TODO : Check this function working properly
 Matrix Camera::GetFPPViewRowMatrix()
 {
     // View 좌표계에서는 정면 방향이 +z, 오른쪽이 +x, 위쪽이 +y이다.

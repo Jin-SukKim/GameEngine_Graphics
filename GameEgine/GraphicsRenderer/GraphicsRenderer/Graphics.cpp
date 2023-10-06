@@ -40,7 +40,8 @@ void Graphics::Update(float dt)
     // 카메라의 이동
     UserInput(dt);
 
-    Matrix view = m_camera.GetFocusViewRowMatrix();
+    //Matrix view = m_camera.GetFocusViewRowMatrix();
+    Matrix view = m_camera.GetFPPViewRowMatrix();
     m_mesh.m_constantVSBufferData.view = view.Transpose();
 
     Matrix proj = m_camera.GetProjRowMatrix();

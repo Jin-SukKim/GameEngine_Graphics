@@ -261,7 +261,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Commons.hlsli" />
+    <None Include="Shader\Commons.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

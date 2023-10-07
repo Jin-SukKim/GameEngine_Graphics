@@ -143,7 +143,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Commons.hlsli">
+    <None Include="Shader\Commons.hlsli">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

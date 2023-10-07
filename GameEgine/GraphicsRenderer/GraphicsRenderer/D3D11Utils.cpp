@@ -77,8 +77,9 @@ void D3D11Utils::CreatePS(ComPtr<ID3D11Device>& device, const std::wstring& file
 	compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
+	// shader에서 include 사용
 	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(), 0, 0, "psMain", "ps_5_0", compileFlags, 0,
+		filename.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, "psMain", "ps_5_0", compileFlags, 0,
 		&shaderBlob, &errorBlob);
 
 	CheckResult(hr, errorBlob.Get());

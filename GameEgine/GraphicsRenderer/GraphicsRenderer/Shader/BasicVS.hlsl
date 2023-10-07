@@ -2,6 +2,7 @@
 cbuffer MeshConstantBuffer : register(b0) // buffer는 register b 사용
 {
     matrix world;
+    matrix invTranspose; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용
     matrix view;
     matrix proj;
 };
@@ -21,6 +22,8 @@ struct VSInput
 struct PSInput
 {
     float4 posProj : SV_POSITION;
+    float3 posWorld : POSITION;
+    float3 normalWorld : NORMAL;
     float3 color : COLOR;
     float2 texcoord : TEXCOORD;
 };
@@ -35,8 +38,11 @@ PSInput vsMain(VSInput input)
     pos = mul(pos, proj);
     
     output.posProj = pos;
+    output.posWorld = input.posWorld;
     output.color = input.color;
     output.texcoord = input.texcoord;
+    
+    output.normalWorld = input.normalWorld;
     
     return output;
 }

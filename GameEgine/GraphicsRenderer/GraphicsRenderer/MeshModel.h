@@ -21,7 +21,8 @@ public:
 
 public:
 	// Constant Data
-	MeshConstData m_constantVSBufferData;
+	MeshVSConstData m_constantVSBufferData;
+	MeshPSConstData m_constantPSBufferData;
 
 private:
 	// Mesh
@@ -34,6 +35,7 @@ private:
 
 	// Buffers
 	ComPtr<ID3D11Buffer> m_meshVSConstantBuffer;
+	ComPtr<ID3D11Buffer> m_meshPSConstantBuffer;
 
 	// 그려야되는 Index 개수
 	UINT m_meshIndexCount = 0;

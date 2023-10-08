@@ -3,6 +3,9 @@
 // 공통되는 부분이나 여러 Shader에서 공통적으로 사용하는 함수를 작성
 
 #define MAX_LIGHTS 3
+#define NUM_DIR_LIGHTS 1
+#define NUM_POINT_LIGHTS 1
+#define NUM_SPOT_LIGHTS 1
 
 // 조명
 struct Light
@@ -13,7 +16,8 @@ struct Light
     float fallOffEnd;
     float3 strength;
     float spotPower;
-    float lightType;
+    float type;
+    float3 etc[3];
 };
 
 // 재질
@@ -43,13 +47,13 @@ float3 BlinnPhong(float3 lightDir, float3 normal, float3 toCam,
     return mat.ambient + (mat.diffuse + specular) * lightStrength;
 }
 
-
+// 태양과 같은 종류의 조명(자연광)이므로 거리값을 사용하지 않아 fallofStart와 fallOfEnd를 사용하지 않는다.
 float3 DirectionalLight(Light L, float3 normal, float3 toCam, Material mat)
 {
     float3 lightDir = -L.dir;
 
     // 표면과 빛의 각도
-    float ndotl = max(dot(normal, lightDir), 0.0f);
+    float ndotl = max(dot(lightDir, normal), 0.0f);
     // 표면 밝기 - 각도가 90도를 넘으면 어두워져서 보이지 않는다.
     float3 lightStrength = L.strength * ndotl;
 
@@ -66,9 +70,9 @@ float CalAttenuation(float d, float fallOfStart, float fallOfEnd)
 
 float3 PointLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
 {
-    float3 lightDir = L.pos - pos;
+    float3 lightVec = L.pos - pos;
     // 렌더링할 Point와 조명 사이의 거리
-    float d = length(lightDir);
+    float d = length(lightVec);
     
     // 모델과 조명이 너무 멀면 조명이 적용되지 않는다.
     if (d > L.fallOffEnd)
@@ -78,10 +82,10 @@ float3 PointLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat
     else
     {
         // 빛의 방향 벡터
-        lightDir /= d;
+        lightVec /= d;
         
         // 표면과 빛의 각도
-        float ndotl = max(dot(normal, lightDir), 0.0f);
+        float ndotl = max(dot(lightVec, normal), 0.0f);
         // 빛의 밝기 - 각도가 90도를 넘으면 어두워져서 보이지 않는다.
         float3 lightStrength = L.strength * ndotl;
         
@@ -89,15 +93,15 @@ float3 PointLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat
         // 밝기
         lightStrength *= att;
         
-        return BlinnPhong(lightDir, normal, toCam, lightStrength, mat);
+        return BlinnPhong(lightVec, normal, toCam, lightStrength, mat);
     }
 }
 
 float3 SpotLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
 {
-    float3 lightDir = L.pos - pos;
+    float3 lightVec = L.pos - pos;
     
-    float d = length(lightDir);
+    float d = length(lightVec);
     
     if (d > L.fallOffEnd)
     {
@@ -106,9 +110,9 @@ float3 SpotLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
     else
     {
         // 빛의 방향 벡터
-        lightDir /= d;
+        lightVec /= d;
         
-        float ndotl = max(dot(normal, lightDir), 0.0f);
+        float ndotl = max(dot(normal, lightVec), 0.0f);
         float3 lightStrength = L.strength * ndotl;
         
         float att = CalAttenuation(d, L.fallOffStart, L.fallOffEnd);
@@ -116,10 +120,10 @@ float3 SpotLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
         
         // Point Light는 조명의 전방 방향만 비춘다.
         // 조명의 방향과 렌더링한 위치에서 조명으로의 방향을 가지고 계산
-        float spotFactor = pow(max(dot(L.dir, -lightDir), 0.0f), L.spotPower);
+        float spotFactor = pow(max(dot(L.dir, -lightVec), 0.0f), L.spotPower);
         lightStrength *= spotFactor;
         
-        return BlinnPhong(lightDir, normal, toCam, lightStrength, mat);
+        return BlinnPhong(lightVec, normal, toCam, lightStrength, mat);
     }
 
 }

@@ -10,6 +10,7 @@ Camera::Camera(Vector3 pos, Vector3 lookAt) : m_camPos(pos), m_camLookAt(lookAt)
     // 임시 up vector
     m_camUp = { 0.f, 1.f, 0.f };
     // 카메라 오른쪽 vector - 오른쪽 방향, eyeDir과 upDir로부터 계산
+    // 곱하는 순서 조심하기
     Vector3 m_camRight = m_camUp.Cross(m_camDir);
     m_camRight.Normalize();
 
@@ -95,8 +96,8 @@ void Camera::MouseRotate(float mouseNdcX, float mouseNdcY)
     
     // NDC좌표계 범위 [-1, 1]로 회전 반경 제한
     m_yaw = mouseNdcX * m_sensitivityX; // 위/아래 회전
-    // mouseNdcY가 -값일 떄 아래로 회전하고 +면 위로 회전하려면
-    // -를 붙여서 저장해준다.
+    // mouseNdcY가 -값일 떄 아래로 회전하고 +면 위로 회전하려면 -를 붙여서 저장해준다.
+    // 스크린 좌표계는 y값이 아래로 갈수록 커지기에 -로 반전시켜주는 것이다.
     m_pitch = -mouseNdcY * m_sensitivityY; // 좌우 회전
 
     Matrix rot = Matrix::CreateRotationX(m_yaw) * Matrix::CreateRotationY(m_pitch);

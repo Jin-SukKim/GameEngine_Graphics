@@ -28,12 +28,17 @@ void Graphics::Update(float dt)
 {
     using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
-    Quaternion q = Quaternion::CreateFromYawPitchRoll(Vector3(m_rotationX, m_rotationY, m_rotationZ));
+    Quaternion q = Quaternion::CreateFromYawPitchRoll(m_rotation);
     Matrix world = Matrix::CreateScale(m_scale)
         * Matrix::CreateFromQuaternion(q)
-        * Matrix::CreateTranslation(Vector3(m_tranlationX, m_tranlationY, m_tranlationZ));
+        * Matrix::CreateTranslation(m_translation);
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
     m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
+
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.world;
+    // 오류 방지
+    m_mesh.m_constantVSBufferData.invWorld.Translation(Vector3(0.f));
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.invWorld.Transpose().Invert();
 
     // 카메라의 이동
     UserInput(dt);
@@ -44,6 +49,22 @@ void Graphics::Update(float dt)
 
     Matrix proj = m_camera.GetProjRowMatrix();
     m_mesh.m_constantVSBufferData.proj = proj.Transpose();
+
+    m_mesh.m_constantPSBufferData.camWorld = m_camera.GetCameraPos();
+    m_mesh.m_constantPSBufferData.useTexture = m_useTexture;
+    m_mesh.m_constantPSBufferData.material.shininess = m_shininess;
+    m_mesh.m_constantPSBufferData.material.diffuse = Vector3(m_diffuse);
+    m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
+
+    // 여러개의 조명을 사용할 때
+    for (int i = 0; i < MAX_LIGHTS; i++)
+    {
+        // 사용하지 않는 조명은 꺼주기
+        if (i != m_light.type)
+            m_mesh.m_constantPSBufferData.light[i].strength *= 0.f;
+        else
+            m_mesh.m_constantPSBufferData.light[i] = m_light;
+    }
 
     m_mesh.UpdateConstantBuffers(m_context);
 }
@@ -89,17 +110,32 @@ void Graphics::Render()
 void Graphics::UpdateGUI()
 {
     ImGui::Checkbox("WireFrame", &m_wireFrame);
-    ImGui::Checkbox("usePerspectiveProjection", &m_usePerspectiveProjection);
+    ImGui::Checkbox("Use PerspectiveProjection", &m_usePerspectiveProjection);
+    ImGui::Checkbox("Use Texture", &m_useTexture);
 
-    ImGui::SliderFloat("Scale", &m_scale, -10.f, 10.f);
+    ImGui::SliderFloat("Scale", &m_scale, 1.f, 10.f);
     
-    ImGui::SliderFloat("Traslation X", &m_tranlationX, -5.f, 5.f);
-    ImGui::SliderFloat("Traslation Y", &m_tranlationY, -5.f, 5.f);
-    ImGui::SliderFloat("Traslation Z", &m_tranlationZ, -5.f, 5.f);
-    
-    ImGui::SliderFloat("Rotation X", &m_rotationX, -3.14f, 3.14f);
-    ImGui::SliderFloat("Rotation Y", &m_rotationY, -3.14f, 3.14f);
-    ImGui::SliderFloat("Rotation Z", &m_rotationZ, -3.14f, 3.14f);
+    ImGui::SliderFloat3("Model Translation", &m_translation.x, -3.14f, 3.14f);
+    ImGui::SliderFloat3("Model Rotation", &m_rotation.x, -3.14f, 3.14f);
+
+    ImGui::SliderFloat("Material Shininess", &m_shininess, 0.f, 256.f);
+    ImGui::SliderFloat("Material Diffuse Color", &m_diffuse, 0.f, 1.f);
+    ImGui::SliderFloat("Material Specular Color", &m_specular, 0.f, 1.f);
+
+    if (ImGui::RadioButton("Directional Light", m_light.type == 0))
+        m_light.type = 0;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Point Light", m_light.type == 1))
+        m_light.type = 1;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Spot Light", m_light.type == 2))
+        m_light.type = 2;
+
+    ImGui::SliderFloat3("Light Position", &m_light.pos.x, -5.f, 5.f);
+    ImGui::SliderFloat3("Light Strength", &m_light.strength.x, 0.f, 1.f);
+    ImGui::SliderFloat("Light Spot Power", &m_light.spotPower, 0.f, 100.f);
+    ImGui::SliderFloat("Light FallOffStart", &m_light.fallOffStart, 0.f, 100.f);
+    ImGui::SliderFloat("Light FallOffEnd", &m_light.fallOffEnd, 0.f, 128.f);
 }
 
 void Graphics::UserInput(float dt)

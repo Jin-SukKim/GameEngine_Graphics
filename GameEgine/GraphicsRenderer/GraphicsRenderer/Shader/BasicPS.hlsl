@@ -25,6 +25,23 @@ struct PSInput
 
 float4 psMain(PSInput input) : SV_TARGET
 {
+    float3 toCam = normalize(camWorld - input.posWorld);
+    float3 color = input.color;
+    
+    // https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-for
+    // https://forum.unity.com/threads/what-are-unroll-and-loop-when-to-use-them.1283096/
+    int i = 0;
+    // 각 조명의 index를 생각해서 for loop를 돌려야된다.
+    [unroll] // warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
+    for (i = 0; i < NUM_DIR_LIGHTS; ++i)
+        color += DirectionalLight(light[i], input.normalWorld, toCam, material);
+    [unroll] 
+    for (i = NUM_DIR_LIGHTS; i < NUM_DIR_LIGHTS + NUM_POINT_LIGHTS; ++i)
+        color += PointLight(light[i], input.posWorld, input.normalWorld, toCam, material);
+    [unroll] 
+    for (i = NUM_DIR_LIGHTS + NUM_POINT_LIGHTS; i < NUM_DIR_LIGHTS + NUM_POINT_LIGHTS + NUM_SPOT_LIGHTS; ++i)
+        color += SpotLight(light[i], input.posWorld, input.normalWorld, toCam, material);
+        
     //return float4(input.color, 1.0);
-    return g_texture0.Sample(g_sampler0, input.texcoord);
+    return useTexture ? float4(color, 1.0) * g_texture0.Sample(g_sampler0, input.texcoord) : float4(color, 1.0f);
 }

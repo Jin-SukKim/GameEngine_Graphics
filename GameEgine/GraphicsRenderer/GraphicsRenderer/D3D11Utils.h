@@ -33,7 +33,7 @@ public:
 	// Index Buffer 생성
 	static void CreateIndexBuffer(
 		ComPtr<ID3D11Device>& device,
-		const std::vector<uint16_t>& indices,
+		const std::vector<uint32_t>& indices,
 		ComPtr<ID3D11Buffer>& indexBuffer);
 
 	// Vertex Buffer 생성
@@ -102,21 +102,22 @@ inline void D3D11Utils::CreateVertexBuffer(ComPtr<ID3D11Device>& device, const s
 template<typename T_CONSTANT>
 inline void D3D11Utils::CreateConstantBuffer(ComPtr<ID3D11Device>& device, const T_CONSTANT& constantBufferData, ComPtr<ID3D11Buffer>& constantBuffer)
 {
-	D3D11_BUFFER_DESC cdDesc;
-	cdDesc.ByteWidth = sizeof(constantBufferData);
+	D3D11_BUFFER_DESC cbDesc;
+	cbDesc.ByteWidth = sizeof(constantBufferData);
 	// 매 프레임 변경될 데이터를 가지므로
-	cdDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cdDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cdDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cdDesc.MiscFlags = 0;
-	cdDesc.StructureByteStride = 0;
+	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA cdData;
-	cdData.pSysMem = &constantBufferData;	// constant data
-	cdData.SysMemPitch = 0;
-	cdData.SysMemSlicePitch = 0;
+	D3D11_SUBRESOURCE_DATA cbData;
+	cbData.pSysMem = &constantBufferData;	// constant data
+	cbData.SysMemPitch = 0;
+	cbData.SysMemSlicePitch = 0;
 
-	auto hr = device->CreateBuffer(&cdDesc, &cdData, constantBuffer.GetAddressOf());
+	auto hr = device->CreateBuffer(&cbDesc, &cbData,
+		constantBuffer.GetAddressOf());
 	if (FAILED(hr))
 	{
 		std::cout << "CreateConstantBuffer() failed. " << std::hex << hr << "\n";

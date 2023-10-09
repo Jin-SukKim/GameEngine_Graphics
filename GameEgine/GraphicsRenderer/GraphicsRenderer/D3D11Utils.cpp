@@ -79,8 +79,8 @@ void D3D11Utils::CreatePS(ComPtr<ID3D11Device>& device, const std::wstring& file
 
 	// shader에서 include 사용
 	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, "psMain", "ps_5_0", compileFlags, 0,
-		&shaderBlob, &errorBlob);
+		filename.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE, "psMain", 
+		"ps_5_0", compileFlags, 0, &shaderBlob, &errorBlob);
 
 	CheckResult(hr, errorBlob.Get());
 
@@ -89,14 +89,14 @@ void D3D11Utils::CreatePS(ComPtr<ID3D11Device>& device, const std::wstring& file
 		NULL, &pixelShader);
 }
 
-void D3D11Utils::CreateIndexBuffer(ComPtr<ID3D11Device>& device, const std::vector<uint16_t>& indices, ComPtr<ID3D11Buffer>& indexBuffer)
+void D3D11Utils::CreateIndexBuffer(ComPtr<ID3D11Device>& device, const std::vector<uint32_t>& indices, ComPtr<ID3D11Buffer>& indexBuffer)
 {
 	D3D11_BUFFER_DESC bDesc = {};
 	bDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	bDesc.ByteWidth = UINT(sizeof(uint16_t) * indices.size());
+	bDesc.ByteWidth = UINT(sizeof(uint32_t) * indices.size());
 	bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bDesc.CPUAccessFlags = 0;
-	bDesc.StructureByteStride = sizeof(uint16_t);
+	bDesc.StructureByteStride = sizeof(uint32_t);
 
 	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
 	indexBufferData.pSysMem = indices.data();

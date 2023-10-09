@@ -2,7 +2,7 @@
 // - (단, shader 프로그램을 실행시키는 함수가 있으면 안된다(ex: main)
 // 공통되는 부분이나 여러 Shader에서 공통적으로 사용하는 함수를 작성
 
-#define MAX_LIGHTS 3
+#define MAX_LIGHTS 3 
 #define NUM_DIR_LIGHTS 1
 #define NUM_POINT_LIGHTS 1
 #define NUM_SPOT_LIGHTS 1
@@ -16,8 +16,8 @@ struct Light
     float fallOffEnd;
     float3 strength;
     float spotPower;
-    float type;
-    float3 etc[3];
+//    int type;
+//    float3 dummy[3];
 };
 
 // 재질

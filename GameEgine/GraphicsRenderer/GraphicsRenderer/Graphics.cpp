@@ -57,15 +57,15 @@ void Graphics::Update(float dt)
     m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
 
     // 여러개의 조명을 사용할 때
-    for (int i = 0; i < MAX_LIGHTS; i++)
-    {
-        // 사용하지 않는 조명은 꺼주기
-        if (i != m_light.type)
-            m_mesh.m_constantPSBufferData.light[i].strength *= 0.f;
-        else
-            m_mesh.m_constantPSBufferData.light[i] = m_light;
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        // 다른 조명 끄기
+        if (i != lightType) {
+            m_mesh.m_constantPSBufferData.lights[i].strength *= 0.0f;
+        }
+        else {
+            m_mesh.m_constantPSBufferData.lights[i] = m_light;
+        }
     }
-
     m_mesh.UpdateConstantBuffers(m_context);
 }
 
@@ -113,7 +113,7 @@ void Graphics::UpdateGUI()
     ImGui::Checkbox("Use PerspectiveProjection", &m_usePerspectiveProjection);
     ImGui::Checkbox("Use Texture", &m_useTexture);
 
-    ImGui::SliderFloat("Scale", &m_scale, 1.f, 10.f);
+    ImGui::SliderFloat3("Scale", &m_scale.x, 1.f, 10.f);
     
     ImGui::SliderFloat3("Model Translation", &m_translation.x, -3.14f, 3.14f);
     ImGui::SliderFloat3("Model Rotation", &m_rotation.x, -3.14f, 3.14f);
@@ -122,20 +122,23 @@ void Graphics::UpdateGUI()
     ImGui::SliderFloat("Material Diffuse Color", &m_diffuse, 0.f, 1.f);
     ImGui::SliderFloat("Material Specular Color", &m_specular, 0.f, 1.f);
 
-    if (ImGui::RadioButton("Directional Light", m_light.type == 0))
-        m_light.type = 0;
+    if (ImGui::RadioButton("Directional Light", lightType == 0)) {
+        lightType = 0;
+    }
     ImGui::SameLine();
-    if (ImGui::RadioButton("Point Light", m_light.type == 1))
-        m_light.type = 1;
+    if (ImGui::RadioButton("Point Light", lightType == 1)) {
+        lightType = 1;
+    }
     ImGui::SameLine();
-    if (ImGui::RadioButton("Spot Light", m_light.type == 2))
-        m_light.type = 2;
+    if (ImGui::RadioButton("Spot Light", lightType == 2)) {
+        lightType = 2;
+    }
 
     ImGui::SliderFloat3("Light Position", &m_light.pos.x, -5.f, 5.f);
     ImGui::SliderFloat3("Light Strength", &m_light.strength.x, 0.f, 1.f);
-    ImGui::SliderFloat("Light Spot Power", &m_light.spotPower, 0.f, 100.f);
+    ImGui::SliderFloat("Light Spot Power", &m_light.spotPower, 1.f, 512.f);
     ImGui::SliderFloat("Light FallOffStart", &m_light.fallOffStart, 0.f, 100.f);
-    ImGui::SliderFloat("Light FallOffEnd", &m_light.fallOffEnd, 0.f, 128.f);
+    ImGui::SliderFloat("Light FallOffEnd", &m_light.fallOffEnd, 0.f, 100.f);
 }
 
 void Graphics::UserInput(float dt)

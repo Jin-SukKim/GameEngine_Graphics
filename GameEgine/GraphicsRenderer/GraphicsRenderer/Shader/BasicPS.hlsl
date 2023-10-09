@@ -5,12 +5,12 @@ Texture2D g_texture0 : register(t0); // t는 texture
 // Texture Image 안의 원하는 위치에서 색깔값을 가져오는 작업을 Sampling이라 한다.
 SamplerState g_sampler0 : register(s0); // s는 sampler
 
-cbuffer PixelConstantBuffer : register(b0)
+cbuffer MeshPSConstData : register(b0)
 {
     float3 camWorld;            // 시점의 월드 좌표계 위치
     bool useTexture;    
     Material material;          // 재질
-    Light light[MAX_LIGHTS];    // 조명
+    Light lights[MAX_LIGHTS]; // 조명
 };
 
 // Pixel Shader Input 구조체
@@ -34,14 +34,13 @@ float4 psMain(PSInput input) : SV_TARGET
     // 각 조명의 index를 생각해서 for loop를 돌려야된다.
     [unroll] // warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
     for (i = 0; i < NUM_DIR_LIGHTS; ++i)
-        color += DirectionalLight(light[i], input.normalWorld, toCam, material);
+        color += DirectionalLight(lights[i], input.normalWorld, toCam, material);
     [unroll] 
     for (i = NUM_DIR_LIGHTS; i < NUM_DIR_LIGHTS + NUM_POINT_LIGHTS; ++i)
-        color += PointLight(light[i], input.posWorld, input.normalWorld, toCam, material);
+        color += PointLight(lights[i], input.posWorld, input.normalWorld, toCam, material);
     [unroll] 
     for (i = NUM_DIR_LIGHTS + NUM_POINT_LIGHTS; i < NUM_DIR_LIGHTS + NUM_POINT_LIGHTS + NUM_SPOT_LIGHTS; ++i)
-        color += SpotLight(light[i], input.posWorld, input.normalWorld, toCam, material);
-        
-    //return float4(input.color, 1.0);
+        color += SpotLight(lights[i], input.posWorld, input.normalWorld, toCam, material);
+     
     return useTexture ? float4(color, 1.0) * g_texture0.Sample(g_sampler0, input.texcoord) : float4(color, 1.0f);
 }

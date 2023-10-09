@@ -23,5 +23,5 @@ struct MeshPSConstData {
 	Vector3 camWorld; // 시점의 월드 좌표계
 	bool useTexture;
 	Material material;
-	Light light[MAX_LIGHTS];
+	Light lights[MAX_LIGHTS];
 };

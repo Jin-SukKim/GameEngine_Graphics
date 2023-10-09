@@ -21,7 +21,6 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
 	D3D11Utils::CreateConstantBuffer(device, m_constantPSBufferData, m_meshPSConstantBuffer);
 	
-
 	// Texture Sampler 설정
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -42,6 +41,9 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 	// Texture 생성
 	D3D11Utils::CreateTexture(device, mesh.texturePath, 
 		m_mesh->m_meshTexture, m_mesh->m_textureResourceView);
+
+	m_mesh->constantBufferVS = m_meshVSConstantBuffer;
+	m_mesh->constantBufferPS = m_meshPSConstantBuffer;
 
 	// Shader 생성
 
@@ -89,7 +91,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	*/
 	// Constant Buffer 설정
 	// (0번 index부터 시작, 1개, constant buffer)
-	context->VSSetConstantBuffers(0, 1, m_meshVSConstantBuffer.GetAddressOf());
+	context->VSSetConstantBuffers(0, 1, m_mesh->constantBufferVS.GetAddressOf());
 
 	// Pixel Shader에 Texture와 Sampler를 넘겨준다.
 	// Texture Data는 TextureResourceView로 Shader에서 사용하는 Resource의
@@ -102,7 +104,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
 	context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기
 	context->PSSetSamplers(0, 1, m_mesh->m_samplerState.GetAddressOf()); // Sampler 넘기기
-	context->PSSetConstantBuffers(0, 1, m_meshPSConstantBuffer.GetAddressOf());
+	context->PSSetConstantBuffers(0, 1, m_mesh->constantBufferPS.GetAddressOf());
 
 
 	// Vertex Buffer의 단위와 offset 설정
@@ -113,7 +115,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	context->IASetInputLayout(m_meshInputLayout.Get());
 	// Vertex/Index Buffer 설정
 	context->IASetVertexBuffers(0, 1, m_mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(m_mesh->indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+	context->IASetIndexBuffer(m_mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // index 3개씩 묶어서 삼각형 만들기

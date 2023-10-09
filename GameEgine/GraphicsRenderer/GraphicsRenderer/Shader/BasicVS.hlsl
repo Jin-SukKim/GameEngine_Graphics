@@ -1,5 +1,5 @@
 // Constant buffer
-cbuffer MeshConstantBuffer : register(b0) // buffer는 register b 사용
+cbuffer MeshVSConstData : register(b0) // buffer는 register b 사용
 {
     matrix world;
     matrix invTranspose; 

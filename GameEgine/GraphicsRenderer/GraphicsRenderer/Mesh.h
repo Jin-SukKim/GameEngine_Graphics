@@ -22,7 +22,8 @@ struct Mesh {
 	ComPtr<ID3D11SamplerState> m_samplerState;
 
 	// constant buffers
-	ComPtr<ID3D11Buffer> constantBuffer;
+	ComPtr<ID3D11Buffer> constantBufferVS;
+	ComPtr<ID3D11Buffer> constantBufferPS;
 
 	// Rendering할 때 필요한 index의 개수
 	UINT indexCount = 0;

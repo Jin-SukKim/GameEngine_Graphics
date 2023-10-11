@@ -35,10 +35,10 @@ void D3D11Utils::CreateVSAndInputLayout(ComPtr<ID3D11Device>& device, const std:
 	HRESULT hr = D3DCompileFromFile(
 		filename.c_str(),	// Shader File Name
 		0,					// macro
-		0,					// shader에 Include 넣어줄 때 사용 (D3D_COMPILE_STANDARD_FILE_INCLUDE)
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,	// shader에 Include 넣어줄 때 사용 (D3D_COMPILE_STANDARD_FILE_INCLUDE)
 		"vsMain",			// Shader의 entryPoint
 		"vs_5_0",			// Shader version
-		0,		// Compile option
+		compileFlags,		// Compile option
 		0,					// Compile Option (주로 0 사용)
 		&shaderBlob,		// 임의의 데이터 공간
 		&errorBlob			// 임의의 데이터 공간
@@ -165,6 +165,8 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& filename,
 	ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& textureResourceView)
 {
+	if (filename.empty())
+		return;
 	// 이미지의 Data
 	int width = 0, height = 0;
 	// 일반적으로 사용하는 이미지 타입 (RGBA값 당 256이므로 8bit면 된다)

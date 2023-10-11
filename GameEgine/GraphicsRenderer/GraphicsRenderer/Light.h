@@ -12,6 +12,8 @@ struct Light {
 	float fallOffEnd = 10.f;				// 빛의 중심으로부터 가장 멀어 이후엔 빛을 받지않는다.
 	Vector3 strength = Vector3(1.f);		// 빛의 세기
 	float spotPower = 1.f;					// 빛의 집중세기
+
+// TODO : 이 값들을 넣으면 제대로된 데이터가 복사가 안된다. (데이터 복사 자체는 된다)
 //	int type = 1;							// 조명 타입 - Directional Light = 0, Point Light = 1, Spot Light = 2
 //	float dummy[3];							// 16byte단위로 전송되기에 더미 데이터
 };

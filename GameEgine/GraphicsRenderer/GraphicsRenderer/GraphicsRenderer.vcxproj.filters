@@ -10,128 +10,128 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Shader">
-      <UniqueIdentifier>{cdaedf75-129b-4216-b456-4c7469d72bf5}</UniqueIdentifier>
+      <UniqueIdentifier>{7c74f590-6f3c-45ab-8710-a66fb2bbc3de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGUI">
-      <UniqueIdentifier>{33a3d6d8-ae67-476f-8fc8-21cb255a10ca}</UniqueIdentifier>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{aad2d045-81cc-4e5c-aac1-feb8dea8d93c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGUI\backends">
-      <UniqueIdentifier>{8ab4c5a6-ba67-4f2d-9be6-93e13641007a}</UniqueIdentifier>
+    <Filter Include="ImGui\backends">
+      <UniqueIdentifier>{58f1b7a0-873f-40cc-a53d-01fd9bb925a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AppBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeometryGenerator.cpp">
+    <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D3D11Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="GeometryGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MeshModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui.cpp">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui_demo.cpp">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui_draw.cpp">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui_tables.cpp">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\imgui_widgets.cpp">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\backends\imgui_impl_dx9.cpp">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\backends\imgui_impl_dx10.cpp">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\backends\imgui_impl_dx11.cpp">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClCompile>
     <ClCompile Include="..\Lib\ImGUI\backends\imgui_impl_win32.cpp">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppBase.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
+    <ClInclude Include="Camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ConstantData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11Utils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="GeometryGenerator.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="MeshData.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D11Utils.h">
+    <ClInclude Include="Graphics.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="Mesh.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MeshModel.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imconfig.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imgui.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imgui_internal.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imstb_rectpack.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imstb_textedit.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\imstb_truetype.h">
-      <Filter>ImGUI</Filter>
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_dx9.h">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_dx10.h">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_dx11.h">
-      <Filter>ImGUI\backends</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_win32.h">
-      <Filter>ImGUI\backends</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Source Files</Filter>
+      <Filter>ImGui\backends</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +139,12 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Shader\BasicVS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\NormalPS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Shader\NormalVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

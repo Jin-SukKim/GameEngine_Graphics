@@ -125,7 +125,26 @@ float3 SpotLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
         
         return BlinnPhong(lightVec, normal, toCam, lightStrength, mat);
     }
-
 }
+
+
+// Vertex Shader Input 구조체
+struct VSInput
+{
+    float3 posWorld : POSITION;
+    float3 color : COLOR0;
+    float3 normalWorld : NORMAL;
+    float2 texcoord : TEXCOORD;
+};
+
+// Pixel Shader Input 구조체
+struct PSInput
+{
+    float4 posProj : SV_POSITION; // screen 좌표계의 위치
+    float3 posWorld : POSITION; // World 좌표계의 위치 (조명 계산에 사용)
+    float3 normalWorld : NORMAL; // World 좌표계의 Normal 
+    float3 color : COLOR;
+    float2 texcoord : TEXCOORD;
+};
 
 

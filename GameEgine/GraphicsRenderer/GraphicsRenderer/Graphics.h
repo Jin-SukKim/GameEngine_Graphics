@@ -24,12 +24,15 @@ protected:
 	bool m_usePerspectiveProjection = true;
 	bool m_wireFrame = false;
 	bool m_useTexture = false;
-	
+	bool m_normalLine = true;
+
 	Vector3 modelAxis = {1.f, 0.f, 0.f};
 	Vector3 m_scale = Vector3(0.3f);
 
 	Vector3 m_translation = Vector3(0.f);
 	Vector3 m_rotation = Vector3(0.f);
+
+	float m_normalScale = 0.05f;
 
 	Light m_light;
 	int lightType = 1;

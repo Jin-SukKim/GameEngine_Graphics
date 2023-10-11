@@ -62,9 +62,47 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 
 	// Pixel Shader 생성
 	D3D11Utils::CreatePS(device, L"Shader/BasicPS.hlsl", m_meshPixelShader);
+
+	// Normal Vector 그리기 - 위에서 생성한 InputLayout을 같이 사용
+	m_normal = std::make_shared<Mesh>();
+
+	std::vector<Vertex> normalVertices;
+	std::vector<uint32_t> normalIndices;
+	// 생성한 Mesh의 data 사용
+	for (size_t i = 0; i < mesh.vertices.size(); i++)
+	{
+		Vertex v = mesh.vertices[i];
+
+		// 시작점과 끝점의 좌표가 같지만 texcoord의 값이 0.f, 1.f로 다르기에 vertex shader에서 변환
+		// Normal Vector는 선분이기에 texcoord는 x좌표만 사용
+		// 시작점
+		v.texcoord.x = 0.f;
+		normalVertices.push_back(v);
+		
+		// 끝점
+		v.texcoord.x = 1.f;
+		normalVertices.push_back(v);
+	
+		// 0-1 선분, 2-3 선분 etc
+		normalIndices.push_back(uint32_t(2 * i));
+		normalIndices.push_back(uint32_t(2 * i + 1));
+	}
+	
+	// Normal Line의 vertex와 index buffer 생성
+	D3D11Utils::CreateVertexBuffer(device, normalVertices, m_normal->vertexBuffer);
+	m_normal->indexCount = (UINT)normalIndices.size();
+	D3D11Utils::CreateIndexBuffer(device, normalIndices, m_normal->indexBuffer);
+
+	D3D11Utils::CreateConstantBuffer(device, m_constantNormalBufferData, m_meshNormalConstantBuffer);
+	m_normal->constantBufferVS = m_meshNormalConstantBuffer;
+	
+	// Normal Vector Line의 Shader 생성
+	D3D11Utils::CreateVSAndInputLayout(
+		device, L"Shader/NormalVS.hlsl", inputElements, m_meshNormalVertexShader, m_meshInputLayout);
+	D3D11Utils::CreatePS(device, L"Shader/NormalPS.hlsl", m_meshNormalPixelShader);
 }
 
-void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
+void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
 {
 	// Graphics Pipeline의 단계
 	// 1. 그리고자 하는 모델의 Vertex와 Index 버퍼
@@ -124,6 +162,28 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context)
 	// (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
 	context->DrawIndexed(m_mesh->indexCount, 0, 0);
 
+	// Normal Vector 그리기
+	if (drawNormal) {
+		context->VSSetShader(m_meshNormalVertexShader.Get(), 0, 0);
+		context->PSSetShader(m_meshNormalPixelShader.Get(), 0, 0);
+
+		// Normal Vector의 Shader에서도 Mesh의 vertex constant buffer의 data를 사용
+		ComPtr<ID3D11Buffer> pptr[2] = {
+			m_mesh->constantBufferVS.Get(),
+			m_normal->constantBufferVS.Get()
+		};
+
+		// 0번 index로 시작하고 2개의 buffer를 사용
+		context->VSSetConstantBuffers(0, 2, pptr->GetAddressOf());
+		
+		context->IASetVertexBuffers(0, 1, m_normal->vertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(m_normal->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	
+		// 선분 그리기
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->DrawIndexed(m_normal->indexCount, 0, 0);
+	}
+
 }
 
 void MeshModel::UpdateConstantBuffers(ComPtr<ID3D11DeviceContext>& context)
@@ -131,4 +191,5 @@ void MeshModel::UpdateConstantBuffers(ComPtr<ID3D11DeviceContext>& context)
 	// Constant Buffer Data를 CPU -> GPU 복사
 	D3D11Utils::UpdateBuffer(context, m_constantVSBufferData, m_meshVSConstantBuffer);
 	D3D11Utils::UpdateBuffer(context, m_constantPSBufferData, m_meshPSConstantBuffer);
+	D3D11Utils::UpdateBuffer(context, m_constantNormalBufferData, m_meshNormalConstantBuffer);
 }

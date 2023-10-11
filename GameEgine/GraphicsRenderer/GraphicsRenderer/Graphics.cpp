@@ -15,7 +15,8 @@ bool Graphics::Initialize()
     // 기본 모델 생성
     {
         // Geometry 정의
-        MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
+        //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
+        MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
         square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
         m_mesh.Initialize(m_device, square);
     }
@@ -66,6 +67,12 @@ void Graphics::Update(float dt)
             m_mesh.m_constantPSBufferData.lights[i] = m_light;
         }
     }
+
+    if (m_normalLine)
+    {   
+        m_mesh.m_constantNormalBufferData.scale = m_normalScale;
+    }
+
     m_mesh.UpdateConstantBuffers(m_context);
 }
 
@@ -104,7 +111,7 @@ void Graphics::Render()
     else
         m_context->RSSetState(m_SolidRasterizerState.Get());
     
-    m_mesh.Render(m_context);
+    m_mesh.Render(m_context, m_normalLine);
 }
 
 void Graphics::UpdateGUI()
@@ -112,8 +119,9 @@ void Graphics::UpdateGUI()
     ImGui::Checkbox("WireFrame", &m_wireFrame);
     ImGui::Checkbox("Use PerspectiveProjection", &m_usePerspectiveProjection);
     ImGui::Checkbox("Use Texture", &m_useTexture);
+    ImGui::Checkbox("Draw Normal Vector", &m_normalLine);
 
-    ImGui::SliderFloat3("Scale", &m_scale.x, 1.f, 10.f);
+    ImGui::SliderFloat3("Scale", &m_scale.x, 0.f, 10.f);
     
     ImGui::SliderFloat3("Model Translation", &m_translation.x, -3.14f, 3.14f);
     ImGui::SliderFloat3("Model Rotation", &m_rotation.x, -3.14f, 3.14f);
@@ -121,6 +129,8 @@ void Graphics::UpdateGUI()
     ImGui::SliderFloat("Material Shininess", &m_shininess, 0.f, 256.f);
     ImGui::SliderFloat("Material Diffuse Color", &m_diffuse, 0.f, 1.f);
     ImGui::SliderFloat("Material Specular Color", &m_specular, 0.f, 1.f);
+
+    ImGui::SliderFloat("Normal Vector Scale", &m_normalScale, 0.0f, 1.f);
 
     if (ImGui::RadioButton("Directional Light", lightType == 0)) {
         lightType = 0;

@@ -13,16 +13,6 @@ cbuffer MeshPSConstData : register(b0)
     Light lights[MAX_LIGHTS]; // 조명
 };
 
-// Pixel Shader Input 구조체
-struct PSInput
-{
-    float4 posProj : SV_POSITION;   // screen 좌표계의 위치
-    float3 posWorld : POSITION;     // World 좌표계의 위치 (조명 계산에 사용)
-    float3 normalWorld : NORMAL;    // World 좌표계의 Normal 
-    float3 color : COLOR;
-    float2 texcoord : TEXCOORD;
-};
-
 float4 psMain(PSInput input) : SV_TARGET
 {
     float3 toCam = normalize(camWorld - input.posWorld);

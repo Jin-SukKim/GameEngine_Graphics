@@ -25,3 +25,8 @@ struct MeshPSConstData {
 	Material material;
 	Light lights[MAX_LIGHTS];
 };
+
+struct MeshNormalConstData {
+	float scale = 0.05f;
+	float dummy[3];
+};

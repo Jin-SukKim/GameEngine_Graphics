@@ -1,124 +1,9 @@
 #include "Graphics.h"
+#include "GeometryGenerator.h"
 
-auto MakeBox()
-{
-    std::vector<Vector3> positions;
-    std::vector<Vector3> colors;
-    std::vector<Vector3> normals;
+#include <directxtk/SimpleMath.h>
 
-    const float scale = 1.0f;
-
-    // 윗면
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
-
-    // 아랫면
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, -1.0f, 0.0f));
-
-    // 앞면
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, -1.0f));
-
-    // 뒷면
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    colors.push_back(Vector3(0.f, 1.0f, 0.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(0.0f, 0.0f, 1.0f));
-
-    // 왼쪽
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(-1.0f, 0.0f, 0.0f));
-
-    // 오른쪽
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-    normals.push_back(Vector3(1.0f, 0.0f, 0.0f));
-
-    // Vertex 형식이 정해져 있다.
-    std::vector<Vertex> vertices;
-    for (size_t i = 0; i < positions.size(); i++) {
-        Vertex v;
-        v.position = positions[i];
-        v.color = colors[i];
-        vertices.push_back(v);
-    }
-
-    // index의 값을 unsigned int16으로 받고 있다. (16bit)
-    // 큰 모델을 사용할 때는 uint32_t도 사용하고 작으면 uint8_t도 사용한다.
-    std::vector<uint16_t> indices = {
-        0,  1,  2,  0,  2,  3,  // 윗면
-        4,  5,  6,  4,  6,  7,  // 아랫면
-        8,  9,  10, 8,  10, 11, // 앞면
-        12, 13, 14, 12, 14, 15, // 뒷면
-        16, 17, 18, 16, 18, 19, // 왼쪽
-        20, 21, 22, 20, 22, 23  // 오른쪽
-    };
-
-    // tuple을 사용해 두 vector를 return
-    return std::tuple{ vertices, indices };
-
-}
-
-// 정육면체 생성
-Graphics::Graphics() : AppBase(), m_indexCount(0)
+Graphics::Graphics() : AppBase()
 {
 }
 
@@ -127,37 +12,14 @@ bool Graphics::Initialize()
 	if (!AppBase::Initialize())
 		return false;
 
-    // Geometry 정의
-    auto [vertices, indices] = MakeBox();
-
-    // Vertex Buffer 생성 후 CPU -> GPU 데이터 복사
-    AppBase::CreateVertexBuffer(vertices, m_vertexBuffer);
-
-    // Index Buffer 생성 후 CPU -> GPU 데이터 복사
-    m_indexCount = UINT(indices.size());
-    AppBase::CreateIndexBuffer(indices, m_indexBuffer);
-
-    // 변환 정의할 때 사용할 Buffer
-    m_constantBufferData.world = Matrix();      // World 행렬
-    m_constantBufferData.view = Matrix();       // View 행렬
-    m_constantBufferData.proj = Matrix(); // Projection 행렬
-    AppBase::CreateConstantBuffer(m_constantBufferData, m_constantBuffer);
-
-    // Shader 생성
-    
-    // InputLayout의 데이터 형식으로 Vertex에 들어가는 데이터 구조체와 같게 설정
-    std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements = {
-        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-        // COLOR가 시작되는 위치로 POSITION이 RGB 각각 4 byte씩 할당한 다음부터 시작하므로 4(byte) * 3(개수)
-        {"COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0}
-    };
-
-    // InputLayout & Vertex Shader 생성
-    AppBase::CreateVSAndInputLayout(L"Shader/BasicVS.hlsl", inputElements,
-        m_vertexShader, m_inputLayout);
-
-    // Pixel Shader 생성
-    AppBase::CreatePS(L"Shader/BasicPS.hlsl", m_pixelShader);
+    // 기본 모델 생성
+    {
+        // Geometry 정의
+        //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
+        MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
+        square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
+        m_mesh.Initialize(m_device, square);
+    }
 
 	return true;
 }
@@ -165,43 +27,53 @@ bool Graphics::Initialize()
 // CPU에서 물체가 어떻게 움직일지 행렬 계산 후 GPU로 전송
 void Graphics::Update(float dt)
 {
-    static float rot = 0.f;
-    rot += dt;
+    using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
-    m_constantBufferData.world = Matrix::CreateScale(0.5f)
-        * Matrix::CreateRotationY(rot) 
-        * Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.0f));
+    Quaternion q = Quaternion::CreateFromYawPitchRoll(m_rotation);
+    Matrix world = Matrix::CreateScale(m_scale)
+        * Matrix::CreateFromQuaternion(q)
+        * Matrix::CreateTranslation(m_translation);
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
-    m_constantBufferData.world = m_constantBufferData.world.Transpose(); // Row-Major -> Column-Major 변환
+    m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
-    // 시점 변환 - 원리 = 시점이 움직이는 반대로 세상의 모든 모델을 움직인다.
-    m_constantBufferData.view =
-        // (카메라 위치, 보는 방향, 카메라의 upVector)
-        DirectX::XMMatrixLookAtLH({ 0.0f, 0.0f, -1.f }, { 0.f, 0.f, 1.f }, { 0.f, 1.f, 0.f });
-    m_constantBufferData.view = m_constantBufferData.view.Transpose();
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.world;
+    // 오류 방지
+    m_mesh.m_constantVSBufferData.invWorld.Translation(Vector3(0.f));
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.invWorld.Transpose().Invert();
 
-    // 투영 행렬
-    const float aspect = AppBase::GetAspectRatio();
-    if (m_usePerspectiveProjection)
-    {
-        // 시야각
-        const float fovAngleY = 70.f * DirectX::XM_PI / 180.f;
-        // 원근 투영
-        m_constantBufferData.proj =
-            // (시야각, 화면비율, Near-Plane, Far-Plane)
-            DirectX::XMMatrixPerspectiveFovLH(fovAngleY, aspect, 0.01f, 100.f);
+    // 카메라의 이동
+    UserInput(dt);
+
+    //Matrix view = m_camera.GetFocusViewRowMatrix();
+    Matrix view = m_camera.GetFPPViewRowMatrix();
+    m_mesh.m_constantVSBufferData.view = view.Transpose();
+
+    Matrix proj = m_camera.GetProjRowMatrix();
+    m_mesh.m_constantVSBufferData.proj = proj.Transpose();
+
+    m_mesh.m_constantPSBufferData.camWorld = m_camera.GetCameraPos();
+    m_mesh.m_constantPSBufferData.useTexture = m_useTexture;
+    m_mesh.m_constantPSBufferData.material.shininess = m_shininess;
+    m_mesh.m_constantPSBufferData.material.diffuse = Vector3(m_diffuse);
+    m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
+
+    // 여러개의 조명을 사용할 때
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        // 다른 조명 끄기
+        if (i != lightType) {
+            m_mesh.m_constantPSBufferData.lights[i].strength *= 0.0f;
+        }
+        else {
+            m_mesh.m_constantPSBufferData.lights[i] = m_light;
+        }
     }
-    else
-    {
-        // 정투영
-        m_constantBufferData.proj =
-            // (x 방향 범위 변수 2개, y 방향 범위 변수 2개, Near-Plane, Far-Plane)
-            DirectX::XMMatrixOrthographicOffCenterLH(-aspect, aspect, -1.0f, 1.0f, 0.1f, 10.0f);
-    }
-    m_constantBufferData.proj = m_constantBufferData.proj.Transpose();
 
-    // Constant Buffer Data를 CPU -> GPU 복사
-    AppBase::UpdateBuffer(m_constantBufferData, m_constantBuffer);
+    if (m_normalLine)
+    {   
+        m_mesh.m_constantNormalBufferData.scale = m_normalScale;
+    }
+
+    m_mesh.UpdateConstantBuffers(m_context);
 }
 
 void Graphics::Render()
@@ -232,46 +104,69 @@ void Graphics::Render()
     
     // Depth/Stencil State 설정
     m_context->OMSetDepthStencilState(m_depthStencilState.Get(), 0); // 기본 state
-
-    // Vertex Shader 설정
-    m_context->VSSetShader(m_vertexShader.Get(), 0, 0);
-
-    /*
-        // 여러 constant buffer 사용시 
-        ID3D11Buffer *pptr[1] = {
-            m_constantBuffer.Get(),
-        };
-        m_context->VSSetConstantBuffers(0, 1, pptr);
-    */ 
-    // Vertex Shader의 Constant Buffer 설정
-    // (0번 index부터 시작, 1개, constant buffer)
-    m_context->VSSetConstantBuffers(0, 1, m_constantBuffer.GetAddressOf());
-
-    // Pixel Shader 설정
-    m_context->PSSetShader(m_pixelShader.Get(), 0, 0);
     
     // Rasterizer State 설정
-    m_context->RSSetState(m_rasterizerState.Get());
-
-    // Vertex/Index Buffer 설정
-    UINT stride = sizeof(Vertex);
-    UINT offset = 0;
+    if (m_wireFrame) // 
+        m_context->RSSetState(m_WireRasterizerState.Get());
+    else
+        m_context->RSSetState(m_SolidRasterizerState.Get());
     
-    // Input Layout 설정
-    m_context->IASetInputLayout(m_inputLayout.Get());
-    // Vertex/Index Buffer 설정
-    m_context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
-    m_context->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
-
-    // Index Buffer가 가진 Vertex들의 연결관계 설정
-    m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // 3개씩 묶어서 삼각형
-    
-    // GPU가 준비되면 Render 시작
-    // (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
-    m_context->DrawIndexed(m_indexCount, 0, 0);
+    m_mesh.Render(m_context, m_normalLine);
 }
 
 void Graphics::UpdateGUI()
 {
-    ImGui::Checkbox("usePerspectiveProjection", &m_usePerspectiveProjection);
+    ImGui::Checkbox("WireFrame", &m_wireFrame);
+    ImGui::Checkbox("Use PerspectiveProjection", &m_usePerspectiveProjection);
+    ImGui::Checkbox("Use Texture", &m_useTexture);
+    ImGui::Checkbox("Draw Normal Vector", &m_normalLine);
+
+    ImGui::SliderFloat3("Scale", &m_scale.x, 0.f, 10.f);
+    
+    ImGui::SliderFloat3("Model Translation", &m_translation.x, -3.14f, 3.14f);
+    ImGui::SliderFloat3("Model Rotation", &m_rotation.x, -3.14f, 3.14f);
+
+    ImGui::SliderFloat("Material Shininess", &m_shininess, 0.f, 256.f);
+    ImGui::SliderFloat("Material Diffuse Color", &m_diffuse, 0.f, 1.f);
+    ImGui::SliderFloat("Material Specular Color", &m_specular, 0.f, 1.f);
+
+    ImGui::SliderFloat("Normal Vector Scale", &m_normalScale, 0.0f, 1.f);
+
+    if (ImGui::RadioButton("Directional Light", lightType == 0)) {
+        lightType = 0;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Point Light", lightType == 1)) {
+        lightType = 1;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Spot Light", lightType == 2)) {
+        lightType = 2;
+    }
+
+    ImGui::SliderFloat3("Light Position", &m_light.pos.x, -5.f, 5.f);
+    ImGui::SliderFloat3("Light Strength", &m_light.strength.x, 0.f, 1.f);
+    ImGui::SliderFloat("Light Spot Power", &m_light.spotPower, 1.f, 512.f);
+    ImGui::SliderFloat("Light FallOffStart", &m_light.fallOffStart, 0.f, 100.f);
+    ImGui::SliderFloat("Light FallOffEnd", &m_light.fallOffEnd, 0.f, 100.f);
+}
+
+void Graphics::UserInput(float dt)
+{
+    // 카메라의 이동
+    // 시간 간격에 비례해서 이동 (dt 사용)
+    if (m_keyPressed[87]) // w : 앞으로 이동
+        m_camera.MoveForward(dt);
+    if (m_keyPressed[83]) // s : 뒤으로 이동
+        m_camera.MoveForward(-dt);
+    if (m_keyPressed[68]) // d : 오른쪽으로 이동
+        m_camera.MoveRight(dt);
+    if (m_keyPressed[65]) // a : 왼쪽으로 이동
+        m_camera.MoveRight(-dt);
+    if (m_keyPressed[69]) // d : 위로 이동
+        m_camera.MoveUp(dt);
+    if (m_keyPressed[81]) // a : 아래로 이동
+        m_camera.MoveUp(-dt);
+
+
 }

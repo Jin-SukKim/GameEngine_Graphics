@@ -1,31 +1,34 @@
 #include "AppBase.h"
 #include <iostream>
+#include <algorithm>
 
-// 전역 변수로 선언해 이벤트 등의 메시지를 처리
-AppBase* appBase = nullptr;
+#include <omp.h> // 가속
+
+// 클래스 멤버 함수에서 간접적으로 윈도우 메시지를
+// 처리할 수 있도록 선언
+AppBase* app = nullptr;
 
 // imgui_impl_wind32에 정의된 메시지 처리 함수
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam,
 	LPARAM lParam);
 
-
 // DispatchMessage 함수가 호출 
 // (hwnd = window 핸들, uMsg = 메시지 코드, wParam, lParam = 메시지와 관련된 추가 데이터)
-LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return appBase->MsgProc(hwnd, uMsg, wParam, lParam);
+LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return app->AppProc(hwnd, uMsg, wParam, lParam);
 }
-
 
 AppBase::AppBase() : m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0),
-m_screenViewPort(D3D11_VIEWPORT()) // viewPort 지정
-{
-	appBase = this;
-}
+m_screenViewPort(D3D11_VIEWPORT()) { // viewPort 지정 
+
+	app = this;
+
+	m_camera.SetAspectRatio(GetAspectRatio());
+} 
 
 AppBase::~AppBase()
 {
-	appBase = nullptr;
+	app = nullptr;
 
 	// ImGUI Clear
 	ImGui_ImplDX11_Shutdown();
@@ -78,10 +81,10 @@ int AppBase::Run()
 			ImGui::End(); // 기록종료
 			ImGui::Render(); 
 			
-			// Game Update
+			// Game Update - Rendering할 데이터를 업데이트
 			Update(ImGui::GetIO().DeltaTime);
 
-			// DirectX Rendering
+			// DirectX Rendering - 업데이트한 데이터로 메모리에 Rendering
 			Render();
 
 			// GUI Rendering
@@ -95,10 +98,78 @@ int AppBase::Run()
 			}
 
 			// GUI 렌더링 후 Present() 호출
+			// 그린 Memory인 Back-buffer와 Front-Buffer를 swap해 화면에 출력
 			m_swapChain->Present(1, 0); // swap-chain의 두 버퍼 swap
 		}
 	}
 	return 0;
+}
+
+void AppBase::OnMouseMove(int mouseX, int mouseY)
+{
+	// 윈도우의 마우스 위치 범위는 좌측 상단이 (0, 0), 우측 하단이 (width - 1, height -1)이다.
+	// 이걸 NDC 좌표 범위로 변환시켜 사용한다. 
+	// NDC 좌표는 좌측 상단 (-1, 1), 우측 하단이 (1, -1)이다.
+	float x = (float)mouseX * 2 / m_screenWidth - 1.f;
+	float y = -(float)mouseY * 2 / m_screenHeight + 1.f;
+
+	// 범위 밖으로 나가지 않도록 clamp 
+	// 이전 좌표와의 차이
+	float gapX = std::clamp(x, -1.f, 1.f) - prevX;
+	float gapY = std::clamp(y, -1.f, 1.f) - prevY;
+
+	prevX = x;
+	prevY = y;
+	// 카메라 시점 회전
+	//m_camera.MouseRotate(gapX, gapY);
+}
+
+LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
+		return true;
+
+	switch (uMsg)
+	{
+	case WM_SIZE:
+		// Reset and resize swapchain
+		break;
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+			return 0;
+		break;
+	case WM_MOUSEMOVE:
+		//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
+		OnMouseMove(LOWORD(lParam), HIWORD(lParam));
+		
+		break;
+	case WM_LBUTTONUP:
+		// cout << "WM_LBUTTONUP Left mouse button" << endl;
+		break;
+	case WM_RBUTTONUP:
+		// cout << "WM_RBUTTONUP Right mouse button" << endl;
+		break;
+	case WM_KEYDOWN:
+		// ESC 누르면 프로그램 종료
+		if (wParam == 27)
+			DestroyWindow(m_mainWindow);
+
+		// 키보드가 눌린 상태 저장
+		m_keyPressed[wParam] = true;
+
+		//std::cout << "WM_KEYDOWN " << (int)wParam << std::endl;
+		break;
+	case WM_KEYUP:
+		// 키보드가 더이상 안눌리면
+		m_keyPressed[wParam] = false;
+		break;
+	case WM_DESTROY:
+		::PostQuitMessage(0);
+		return 0;
+	}
+
+	// 기본 메시지 처리 (특정 메시지를 처리하지 않는 경우)
+	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 float AppBase::GetAspectRatio() const
@@ -124,6 +195,7 @@ bool AppBase::InitWindow()
 		L"Game Engine", // lpszClassName, L-String
 		NULL
 	};
+
 
 	// 운영 체제에 window 클래스 등록
 	if (!RegisterClassEx(&wc))
@@ -280,7 +352,11 @@ bool AppBase::InitD3D()
 	rastDesc.FrontCounterClockwise = false; 
 
 	// RasterizerState 생성
-	m_device->CreateRasterizerState(&rastDesc, m_rasterizerState.GetAddressOf());
+	m_device->CreateRasterizerState(&rastDesc, m_SolidRasterizerState.GetAddressOf());
+
+	// WireFrame 용 RasterizerState 생성
+	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+	m_device->CreateRasterizerState(&rastDesc, m_WireRasterizerState.GetAddressOf());
 
 	// Depth Buffer 옵션 설정
 	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -374,141 +450,5 @@ bool AppBase::InitGUI()
 	if (!ImGui_ImplDX11_Init(m_device.Get(), m_context.Get()))
 		return false;
 
-
 	return true;
-}
-
-// https://learn.microsoft.com/en-us/windows/win32/direct3d11/how-to--compile-a-shader
-void CheckResult(HRESULT hr, ID3DBlob* errorBlob)
-{
-	if (FAILED(hr))
-	{
-		// 파일이 없는 경우
-		if ((hr & D3D11_ERROR_FILE_NOT_FOUND) != 0)
-			std::cout << "File not found.\n";
-		
-		// 에러 메시지가 있는 경우
-		if (errorBlob)
-			std::cout << "Shader compile error\n" << (char*)errorBlob->GetBufferPointer() << "\n";
-	}	
-}
-
-void AppBase::CreateVSAndInputLayout(const std::wstring& filename, const std::vector<D3D11_INPUT_ELEMENT_DESC>& inputElements, ComPtr<ID3D11VertexShader>& vertexShader, ComPtr<ID3D11InputLayout>& inputLayout)
-{
-	// 임시로 사용할 데이터를 저장할 공간
-	ComPtr<ID3DBlob> shaderBlob;
-	ComPtr<ID3DBlob> errorBlob;
-
-	UINT compileFlags = 0;
-#if defined(DEBUG) || defined(_DEBUG)
-	compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(),	// Shader File Name
-		0,					// macro
-		0,					// shader에 Include 넣어줄 때 사용 (D3D_COMPILE_STANDARD_FILE_INCLUDE)
-		"VSmain",			// Shader의 entryPoint
-		"vs_5_0",			// Shader version
-		0,		// Compile option
-		0,					// Compile Option (주로 0 사용)
-		&shaderBlob,		// 임의의 데이터 공간
-		&errorBlob			// 임의의 데이터 공간
-	);
-
-	CheckResult(hr, errorBlob.Get());
-
-	// Shader는 GPU에서 사용하는 프로그램과 같다.
-
-	// InputLayout이 Vertex Shader로 어떤 데이터가 들어갈지 지정
-	// vertex shader 생성
-	m_device->CreateVertexShader(
-		shaderBlob->GetBufferPointer(),	// Compile한 Shader
-		shaderBlob->GetBufferSize(),	// Compile한 Shader의 크기
-		NULL,							// ClassLinkage 인터페이스 포인터
-		&vertexShader					// 생성한 shader 할당
-	);
-
-	// Input Layout 생성
-	m_device->CreateInputLayout(
-		inputElements.data(),			// InputLayout 데이터 형식  배열
-		UINT(inputElements.size()),		// Input-Elements 배열 크기
-		shaderBlob->GetBufferPointer(),	// Compile한 Shader
-		shaderBlob->GetBufferSize(),	// Compile한 Shader 크기
-		&inputLayout					// 생성한 InputLayout 할당
-	);
-}
-
-void AppBase::CreatePS(const std::wstring& filename, ComPtr<ID3D11PixelShader>& pixelShader)
-{
-	ComPtr<ID3DBlob> shaderBlob;
-	ComPtr<ID3DBlob> errorBlob;
-
-	UINT compileFlags = 0;
-#if defined(DEBUG) || defined(_DEBUG)
-	compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-#endif
-
-	HRESULT hr = D3DCompileFromFile(
-		filename.c_str(), 0, 0, "PSmain", "ps_5_0", compileFlags, 0, 
-		&shaderBlob, &errorBlob);
-
-	CheckResult(hr, errorBlob.Get());
-
-	m_device->CreatePixelShader(
-		shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(),
-		NULL, &pixelShader);
-}
-
-void AppBase::CreateIndexBuffer(const std::vector<uint16_t>& indices, ComPtr<ID3D11Buffer>& indexBuffer)
-{
-	D3D11_BUFFER_DESC bDesc = {};
-	bDesc.Usage = D3D11_USAGE_IMMUTABLE;
-	bDesc.ByteWidth = UINT(sizeof(uint16_t) * indices.size());
-	bDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bDesc.CPUAccessFlags = 0;
-	bDesc.StructureByteStride = sizeof(uint16_t);
-
-	D3D11_SUBRESOURCE_DATA indexBufferData = { 0 };
-	indexBufferData.pSysMem = indices.data();
-	indexBufferData.SysMemPitch = 0;
-	indexBufferData.SysMemSlicePitch = 0;
-
-	m_device->CreateBuffer(&bDesc, &indexBufferData, indexBuffer.GetAddressOf());
-}
-
-
-LRESULT CALLBACK AppBase::MsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam))
-		return true;
-
-	switch (uMsg)
-	{
-	case WM_SIZE:
-		// Reset and resize swapchain
-		break;
-	case WM_SYSCOMMAND:
-		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-			return 0;
-		break;
-	case WM_MOUSEMOVE:
-		// cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << endl;
-		break;
-	case WM_LBUTTONUP:
-		// cout << "WM_LBUTTONUP Left mouse button" << endl;
-		break;
-	case WM_RBUTTONUP:
-		// cout << "WM_RBUTTONUP Right mouse button" << endl;
-		break;
-	case WM_KEYDOWN:
-		// cout << "WM_KEYDOWN " << (int)wParam << endl;
-		break;
-	case WM_DESTROY:
-		::PostQuitMessage(0);
-		return 0;
-	}
-
-	// 기본 메시지 처리 (특정 메시지를 처리하지 않는 경우)
-	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }

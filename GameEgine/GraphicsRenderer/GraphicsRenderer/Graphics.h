@@ -2,24 +2,8 @@
 
 #include "AppBase.h"
 #include <vector>
-// DirectX의 Math Library를 좀 더 간편하게 사용할 수 있는 Library
-#include <directxtk/SimpleMath.h>
 
-using DirectX::SimpleMath::Vector3;
-using DirectX::SimpleMath::Matrix;
-
-struct Vertex {
-	Vector3 position;
-	Vector3 color;
-};
-
-// 16 byte 단위 (float 4개) 단위로 전송
-// Matrix = XMFLOAT4 = float 4개
-struct MeshConstant {
-	Matrix world;
-	Matrix view;
-	Matrix proj;
-};
+#include "MeshModel.h"
 
 class Graphics : public AppBase {
 public:
@@ -30,20 +14,29 @@ public:
 	virtual void Render() override;
 	virtual void UpdateGUI() override;
 
+	void UserInput(float dt);
+
 protected:
-	// Shaders
-	ComPtr<ID3D11VertexShader> m_vertexShader;
-	ComPtr<ID3D11PixelShader> m_pixelShader;
-	ComPtr<ID3D11InputLayout> m_inputLayout;
+	MeshModel m_mesh;
 
-	// Buffers
-	ComPtr<ID3D11Buffer> m_vertexBuffer;
-	ComPtr<ID3D11Buffer> m_indexBuffer;
-	ComPtr<ID3D11Buffer> m_constantBuffer;
-	UINT m_indexCount;
-
-	MeshConstant m_constantBufferData;
-
+	// ImGUI parameters
 	// 원근 투영을 사용할 것인지
 	bool m_usePerspectiveProjection = true;
+	bool m_wireFrame = false;
+	bool m_useTexture = false;
+	bool m_normalLine = true;
+
+	Vector3 modelAxis = {1.f, 0.f, 0.f};
+	Vector3 m_scale = Vector3(0.3f);
+
+	Vector3 m_translation = Vector3(0.f);
+	Vector3 m_rotation = Vector3(0.f);
+
+	float m_normalScale = 0.05f;
+
+	Light m_light;
+	int lightType = 1;
+	float m_diffuse = 0.5f;
+	float m_specular = 1.f;
+	float m_shininess = 8.f; 
 };

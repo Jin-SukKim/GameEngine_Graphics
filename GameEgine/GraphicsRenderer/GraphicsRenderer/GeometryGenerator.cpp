@@ -559,8 +559,8 @@ MeshData GeometryGenerator::SubdivideToSphere(const float& radius, MeshData sphe
         v.pos = v.normal * radius;
     };
 
-    // 같은 위치의 vertex들이 같은 normal vector를 가진 경우와 (더 각져있다)
-    // 각각의 face normal vector를 가진 경우 결과가 달라진다. (더 부드러워진다)
+    // 같은 위치의 vertex들이 같은 normal vector를 가진 경우와 (더 부드러워진다)
+    // 각각의 face normal vector를 가진 경우 결과가 달라진다. (더 각져있다)
     auto UpdateFaceNormal = [](Vertex& v0, Vertex& v1, Vertex& v2) {
         auto faceNormal = (v1.pos - v0.pos).Cross(v2.pos - v0.pos);
         faceNormal.Normalize();
@@ -645,4 +645,9 @@ MeshData GeometryGenerator::SubdivideToSphere(const float& radius, MeshData sphe
     }
 
     return newSphere;
+}
+
+std::vector<MeshData> GeometryGenerator::ReadFromFile(const std::string& basePath, const std::string& fileName)
+{
+    return std::vector<MeshData>();
 }

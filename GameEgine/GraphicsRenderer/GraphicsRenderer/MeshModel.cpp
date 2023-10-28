@@ -2,25 +2,11 @@
 
 #include "MeshModel.h"
 #include "D3D11Utils.h"
+#include "GeometryGenerator.h"
 
 
-void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
+void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshData>& meshes)
 {
-	m_mesh = std::make_shared<Mesh>();
-	// VertexBuffer 생성 후 CPU -> GPU 데이터 복사
-	D3D11Utils::CreateVertexBuffer(device, mesh.vertices, m_mesh->vertexBuffer);
-	// Index Buffer 생성 후 CPU -> GPU 데이터 복사
-	D3D11Utils::CreateIndexBuffer(device, mesh.indices, m_mesh->indexBuffer);
-	// Index Count 복사
-	m_mesh->indexCount = (UINT)mesh.indices.size();
-
-	// Constant Buffer 생성
-	m_constantVSBufferData.world = Matrix(); // World 행렬
-	m_constantVSBufferData.view = Matrix(); // View 행렬
-	m_constantVSBufferData.proj = Matrix(); // Projection 행렬
-	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
-	D3D11Utils::CreateConstantBuffer(device, m_constantPSBufferData, m_meshPSConstantBuffer);
-	
 	// Texture Sampler 설정
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -35,15 +21,41 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
+	// 하나의 모델이 여러 개의 메쉬로 이루어져 있지만 Sampler와 Constant buffer는
+	// 하나를 사용해야 여러 메쉬들이 하나의 모델처럼 보인다.
 	// Sampler State 생성
-	device->CreateSamplerState(&sampDesc, m_mesh->m_samplerState.GetAddressOf());
+	device->CreateSamplerState(&sampDesc, m_samplerState.GetAddressOf());
 
-	// Texture 생성
-	D3D11Utils::CreateTexture(device, mesh.texturePath, 
-		m_mesh->m_meshTexture, m_mesh->m_textureResourceView);
+	// Constant Buffer 생성
+	m_constantVSBufferData.world = Matrix(); // World 행렬
+	m_constantVSBufferData.view = Matrix(); // View 행렬
+	m_constantVSBufferData.proj = Matrix(); // Projection 행렬
+	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
+	D3D11Utils::CreateConstantBuffer(device, m_constantPSBufferData, m_meshPSConstantBuffer);
 
-	m_mesh->constantBufferVS = m_meshVSConstantBuffer;
-	m_mesh->constantBufferPS = m_meshPSConstantBuffer;
+	for (const MeshData& mData : meshes)
+	{
+		std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>();
+		// VertexBuffer 생성 후 CPU -> GPU 데이터 복사
+		D3D11Utils::CreateVertexBuffer(device, mData.vertices, newMesh->vertexBuffer);
+		// Index Buffer 생성 후 CPU -> GPU 데이터 복사
+		D3D11Utils::CreateIndexBuffer(device, mData.indices, newMesh->indexBuffer);
+		// Index Count 복사
+		newMesh->indexCount = (UINT)mData.indices.size();
+
+		
+		// Texture 생성
+		if (!mData.texturePath.empty()) {
+			D3D11Utils::CreateTexture(device, mData.texturePath,
+				newMesh->m_meshTexture, newMesh->m_textureResourceView);
+		}
+
+		// 하나의 모델이므로 같은 constant data 사용
+		newMesh->constantBufferVS = m_meshVSConstantBuffer;
+		newMesh->constantBufferPS = m_meshPSConstantBuffer;
+
+		m_meshes.push_back(newMesh);
+	}
 
 	// Shader 생성
 
@@ -68,38 +80,53 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, MeshData& mesh)
 
 	std::vector<Vertex> normalVertices;
 	std::vector<uint32_t> normalIndices;
-	// 생성한 Mesh의 data 사용
-	for (size_t i = 0; i < mesh.vertices.size(); i++)
-	{
-		Vertex v = mesh.vertices[i];
 
-		// 시작점과 끝점의 좌표가 같지만 texcoord의 값이 0.f, 1.f로 다르기에 vertex shader에서 변환
-		// Normal Vector는 선분이기에 texcoord는 x좌표만 사용
-		// 시작점
-		v.texcoord.x = 0.f;
-		normalVertices.push_back(v);
-		
-		// 끝점
-		v.texcoord.x = 1.f;
-		normalVertices.push_back(v);
-	
-		// 0-1 선분, 2-3 선분 etc
-		normalIndices.push_back(uint32_t(2 * i));
-		normalIndices.push_back(uint32_t(2 * i + 1));
+	// 여러 메쉬의 normal들을 하나로 합치기
+	size_t offset = 0;
+	for (const MeshData& mData : meshes) {
+		// 생성한 Mesh의 data 사용
+		for (size_t i = 0; i < mData.vertices.size(); i++)
+		{
+			Vertex v = mData.vertices[i];
+
+			// 시작점과 끝점의 좌표가 같지만 texcoord의 값이 0.f, 1.f로 다르기에 vertex shader에서 변환
+			// Normal Vector는 선분이기에 texcoord는 x좌표만 사용
+			// 시작점
+			v.texcoord.x = 0.f;
+			normalVertices.push_back(v);
+
+			// 끝점
+			v.texcoord.x = 1.f;
+			normalVertices.push_back(v);
+
+			// 0-1 선분, 2-3 선분 etc
+			normalIndices.push_back(uint32_t(2 * (i + offset)));
+			normalIndices.push_back(uint32_t(2 * (i + offset) + 1));
+		}
+		// 1d array를 2d array로 사용하는 것처럼 여러 메쉬들의 normal을
+		// offset을 활용해 하나로 합쳐준다.
+		offset += mData.vertices.size();
 	}
-	
+
 	// Normal Line의 vertex와 index buffer 생성
 	D3D11Utils::CreateVertexBuffer(device, normalVertices, m_normal->vertexBuffer);
 	m_normal->indexCount = (UINT)normalIndices.size();
 	D3D11Utils::CreateIndexBuffer(device, normalIndices, m_normal->indexBuffer);
 
 	D3D11Utils::CreateConstantBuffer(device, m_constantNormalBufferData, m_meshNormalConstantBuffer);
-	m_normal->constantBufferVS = m_meshNormalConstantBuffer;
-	
+
 	// Normal Vector Line의 Shader 생성
 	D3D11Utils::CreateVSAndInputLayout(
 		device, L"Shader/NormalVS.hlsl", inputElements, m_meshNormalVertexShader, m_meshInputLayout);
 	D3D11Utils::CreatePS(device, L"Shader/NormalPS.hlsl", m_meshNormalPixelShader);
+}
+
+void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::string& basePath, const std::string& fileName)
+{
+	// 파일로부터 데이터 가져오기
+	std::vector<MeshData> meshes = GeometryGenerator::ReadFromFile(basePath, fileName);
+	// 가져온 데이터로 buffer 초기화
+	Initialize(device, meshes);
 }
 
 void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
@@ -119,48 +146,50 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
 	context->VSSetShader(m_meshVertexShader.Get(), 0, 0);
 	// Pixel Shader 설정
 	context->PSSetShader(m_meshPixelShader.Get(), 0, 0);
-
-	/*
-		// 여러 constant buffer 사용시
-		ID3D11Buffer *pptr[1] = {
-			m_constantBuffer.Get(),
-		};
-		m_context->VSSetConstantBuffers(0, 1, pptr);
-	*/
-	// Constant Buffer 설정
-	// (0번 index부터 시작, 1개, constant buffer)
-	context->VSSetConstantBuffers(0, 1, m_mesh->constantBufferVS.GetAddressOf());
-
-	// Pixel Shader에 Texture와 Sampler를 넘겨준다.
-	// Texture Data는 TextureResourceView로 Shader에서 사용하는 Resource의
-	// 실질적 데이터가 들어가 있다.
-	// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
-	ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
-	{
-		m_mesh->m_textureResourceView.Get()
-	};
-	// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
-	context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기
-	context->PSSetSamplers(0, 1, m_mesh->m_samplerState.GetAddressOf()); // Sampler 넘기기
-	context->PSSetConstantBuffers(0, 1, m_mesh->constantBufferPS.GetAddressOf());
+	// Texture에 쓸 Sampler 넘기기
+	context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf()); 
 
 
 	// Vertex Buffer의 단위와 offset 설정
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
+	for (const std::shared_ptr<Mesh>& mesh : m_meshes)
+	{
+		/*
+			// 여러 constant buffer 사용시
+			ID3D11Buffer *pptr[1] = {
+				m_constantBuffer.Get(),
+			};
+			m_context->VSSetConstantBuffers(0, 1, pptr);
+		*/
+		// Constant Buffer 설정
+		// (0번 index부터 시작, 1개, constant buffer)
+		context->VSSetConstantBuffers(0, 1, mesh->constantBufferVS.GetAddressOf());
 
-	// Input Layout 설정
-	context->IASetInputLayout(m_meshInputLayout.Get());
-	// Vertex/Index Buffer 설정
-	context->IASetVertexBuffers(0, 1, m_mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(m_mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		// Pixel Shader에 Texture와 Sampler를 넘겨준다.
+		// Texture Data는 TextureResourceView로 Shader에서 사용하는 Resource의
+		// 실질적 데이터가 들어가 있다.
+		// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
+		ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
+		{
+			mesh->m_textureResourceView.Get()
+		};
+		// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
+		context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기
+		context->PSSetConstantBuffers(0, 1, mesh->constantBufferPS.GetAddressOf());
 
-	// Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
-	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // index 3개씩 묶어서 삼각형 만들기
+		// Input Layout 설정
+		context->IASetInputLayout(m_meshInputLayout.Get());
+		// Vertex/Index Buffer 설정
+		context->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	// GPU가 준비되면 Render
-	// (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
-	context->DrawIndexed(m_mesh->indexCount, 0, 0);
+		// Index Buffer가 가진 Vertex들의 연결관계 설정 (_TRIANGLESTRIP 등)
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // index 3개씩 묶어서 삼각형 만들기
+		// GPU가 준비되면 Render
+		// (몇 개를 그릴지 지정, Buffer에서 몇 번쨰 index로부터 그리기 시작할 지 지정)
+		context->DrawIndexed(mesh->indexCount, 0, 0);
+	}
 
 	// Normal Vector 그리기
 	if (drawNormal) {
@@ -169,8 +198,8 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
 
 		// Normal Vector의 Shader에서도 Mesh의 vertex constant buffer의 data를 사용
 		ComPtr<ID3D11Buffer> pptr[2] = {
-			m_mesh->constantBufferVS.Get(),
-			m_normal->constantBufferVS.Get()
+			m_meshVSConstantBuffer.Get(),
+			m_meshNormalConstantBuffer.Get()
 		};
 
 		// 0번 index로 시작하고 2개의 buffer를 사용

@@ -18,7 +18,7 @@ bool Graphics::Initialize()
         //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
         MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
         square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
-        m_mesh.Initialize(m_device, square);
+        m_mesh.Initialize(m_device, { square });
     }
 
 	return true;

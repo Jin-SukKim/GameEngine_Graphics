@@ -76,13 +76,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\assimp\include\assimp\;$(SolutionDir)\Lib\assimp\lib\debug\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -93,14 +93,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\assimp\include\assimp\;$(SolutionDir)\Lib\assimp\lib\debug\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -109,13 +109,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;%(AdditionalIncludeDirectories);$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\assimp\include\assimp\;$(SolutionDir)\Lib\assimp\lib\debug\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,14 +126,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;$(SolutionDir)\Lib\stb-master\;$(SolutionDir)\Assets\;$(SolutionDir)\Lib\ImGUI\backends;$(SolutionDir)\Lib\ImGUI\;$(SolutionDir)\Lib\assimp\include\assimp\;$(SolutionDir)\Lib\assimp\lib\debug\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,6 +153,7 @@
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshModel.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_dx10.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="MeshModel.h" />
+    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>

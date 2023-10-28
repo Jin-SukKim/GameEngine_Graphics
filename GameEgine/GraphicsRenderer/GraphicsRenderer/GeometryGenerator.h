@@ -23,6 +23,7 @@ public:
 	// 또 다른 Sphere 생성 방법
 	static MeshData MakeIcosahedron();
 	static MeshData MakeTetrahedron();
-
+	// 하나의 삼각형 메쉬를 여러 삼각형으로 나누는 함수
 	static MeshData SubdivideToSphere(const float& radius, MeshData sphere);
+	static std::vector<MeshData> ReadFromFile(const std::string& basePath, const std::string& fileName);
 };

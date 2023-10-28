@@ -18,8 +18,6 @@ struct Mesh {
 	// 즉, 같은 Texture 메모리 공간이어도 RenderTarget이나 Resource로 사용할 수도 있으므로
 	// 별도의 ResourceView를 만들어 입력으로 넣어준다.
 	ComPtr<ID3D11ShaderResourceView> m_textureResourceView;
-	// Texture를 Sampling할 때 사용하는 Sampler
-	ComPtr<ID3D11SamplerState> m_samplerState;
 
 	// constant buffers
 	ComPtr<ID3D11Buffer> constantBufferVS;

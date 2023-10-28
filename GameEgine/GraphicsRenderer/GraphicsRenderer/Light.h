@@ -17,13 +17,3 @@ struct Light {
 //	int type = 1;							// 조명 타입 - Directional Light = 0, Point Light = 1, Spot Light = 2
 //	float dummy[3];							// 16byte단위로 전송되기에 더미 데이터
 };
-
-// 재질 - 재질에 사용되는 색의 값은 보통은 Texture에서 가져온다.
-struct Material {
-	Vector3 ambient = Vector3(0.1f);	// 물체의 고유 색 - default (옅은 흰색)
-	float shininess = 8.f;				// 물체의 메탈 강도(반짝임의 강도)
-	Vector3 diffuse = Vector3(0.f);		// 분산광 - 빛을 받아 색을 표현
-	float dummy1;						// 16byte단위로 전송되기에 더미 데이터
-	Vector3 specular = Vector3(1.f);	// 반사광 - 메탈릭한 재질은 반짝이는 효과 - default(흰색)
-	float dummy2;						// 16byte단위로 전송되기에 더미 데이터
-};

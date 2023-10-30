@@ -16,9 +16,13 @@ bool Graphics::Initialize()
     {
         // Geometry Á¤ÀÇ
         //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
-        MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
-        square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
-        m_mesh.Initialize(m_device, { square });
+        //MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
+        //square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
+        //m_mesh.Initialize(m_device, { square });
+        m_mesh.Initialize(
+            m_device, 
+            "C:/Study/Project/GameEgine/GraphicsRenderer/Assets/Models/f3d-data/zelda-breath-of-the-wild/source/zeldaPosed001/",
+            "zeldaPosed001.fbx");
     }
 
 	return true;

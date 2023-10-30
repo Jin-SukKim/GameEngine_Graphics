@@ -3,6 +3,9 @@
 #include "Camera.h"
 
 // windows
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 // #include <wrl.h> // ComPtr
 

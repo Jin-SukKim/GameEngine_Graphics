@@ -119,6 +119,7 @@ MeshData ModelLoader::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     // mesh의 material index 정보를 사용해 데이터를 가져와야 한다.)
     // 어떤 mesh에 어떤 texture를 사용할 지를 파일 이름으로 받아온다.
     // http://assimp.sourceforge.net/lib_html/materials.html
+
     if (mesh->mMaterialIndex >= 0) {
         // scene에서 material 데이터 가져오기
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];

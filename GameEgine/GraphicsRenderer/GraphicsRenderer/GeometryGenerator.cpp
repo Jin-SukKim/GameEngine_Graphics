@@ -2,6 +2,7 @@
 #pragma once
 
 #include <iostream>
+#include "ModelLoader.h"
 
 MeshData GeometryGenerator::MakeCube()
 {
@@ -649,5 +650,51 @@ MeshData GeometryGenerator::SubdivideToSphere(const float& radius, MeshData sphe
 
 std::vector<MeshData> GeometryGenerator::ReadFromFile(const std::string& basePath, const std::string& fileName)
 {
-    return std::vector<MeshData>();
+    using namespace DirectX;
+
+    ModelLoader modelLoader;
+
+    // 파일 읽기
+    modelLoader.LoadModel(basePath, fileName);
+    std::vector<MeshData>& meshes = modelLoader.meshes;
+
+    
+    // 읽어 들인 모델의 vertex들의 범위가 어느 정도 되는지 알 수 없기에
+    // 렌더링하기 적당한 크기로 Scale을 맞춰준다.
+    // scale을 맞춰주지 않으면 맨 처음 모델의 크기를 알 수가 없다.
+    
+    // Normalize vertices (적당한 크기의 범위를 찾는다)
+    Vector3 vmin(1000, 1000, 1000);
+    Vector3 vmax(-1000, -1000, -1000);
+    for (auto& mesh : meshes) {
+        for (auto& v : mesh.vertices) {
+            vmin.x = XMMin(vmin.x, v.pos.x);
+            vmin.y = XMMin(vmin.y, v.pos.y);
+            vmin.z = XMMin(vmin.z, v.pos.z);
+            vmax.x = XMMax(vmax.x, v.pos.x);
+            vmax.y = XMMax(vmax.y, v.pos.y);
+            vmax.z = XMMax(vmax.z, v.pos.z);
+        }
+    }
+
+    // 지정한 -1000, 1000이나 모델의 vertex 중 가장 작고 큰 값으로 scale할 범위를 구한다.
+    float dx = vmax.x - vmin.x, dy = vmax.y - vmin.y, dz = vmax.z - vmin.z;
+    // 가장 큰 범위 구하기
+    float dl = XMMax(XMMax(dx, dy), dz);
+    // 가장 작은 값과 큰 값의 중간값 구하기 (중간 범위)
+    float cx = (vmax.x + vmin.x) * 0.5f, cy = (vmax.y + vmin.y) * 0.5f,
+        cz = (vmax.z + vmin.z) * 0.5f;
+
+    // 범위에 맞춰서 vertex 위치 조정
+    for (auto& mesh : meshes) {
+        for (auto& v : mesh.vertices) {
+            // 중간 범위만큼 움직인 후 가장 큰 값으로 나눠 scale 조정
+            v.pos.x = (v.pos.x - cx) / dl;
+            v.pos.y = (v.pos.y - cy) / dl;
+            v.pos.z = (v.pos.z - cz) / dl;
+        }
+    }
+    
+
+    return meshes;
 }

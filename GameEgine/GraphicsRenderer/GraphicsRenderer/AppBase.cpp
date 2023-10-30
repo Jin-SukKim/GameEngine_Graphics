@@ -23,6 +23,7 @@ m_screenViewPort(D3D11_VIEWPORT()) { // viewPort 지정
 
 	app = this;
 
+	m_camera = Camera({ 0.0f, 0.0f, -0.5f }, { 0.0f, 0.0f, 0.0f });
 	m_camera.SetAspectRatio(GetAspectRatio());
 } 
 
@@ -140,14 +141,15 @@ LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_MOUSEMOVE:
 		//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
-		OnMouseMove(LOWORD(lParam), HIWORD(lParam));
 		
 		break;
 	case WM_LBUTTONUP:
 		// cout << "WM_LBUTTONUP Left mouse button" << endl;
+
 		break;
 	case WM_RBUTTONUP:
 		// cout << "WM_RBUTTONUP Right mouse button" << endl;
+		//OnMouseMove(LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_KEYDOWN:
 		// ESC 누르면 프로그램 종료

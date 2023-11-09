@@ -11,7 +11,28 @@ cbuffer MeshPSConstData : register(b0)
     bool useTexture;    
     Material material;          // 재질
     Light lights[MAX_LIGHTS]; // 조명
+    // Rim Effect
+    float3 rimColor;
+    float rimPower;
+    float rimStrength;
+    bool useSmoothStep;
 };
+
+// object의 테두리에 빛이 나는 역광 조명 효과
+float3 RimLighting(float3 color, float3 toCam, float3 normal)
+{
+    // 모델의 중심에 가까울수록 dot product의 값은 1.0에 가까워진다. (안으로 갈수록 rim값은 0.0에 가까워진다.)
+    float rim = 1.0f - dot(toCam, normal);
+    
+    // Smoothstep
+    // https://thebookofshaders.com/glossary/?search=smoothstep
+    if (useSmoothStep)
+        rim = smoothstep(0.0f, 1.0f, rim); // 내장함수 사용
+    
+    rim = pow(abs(rim), rimPower);
+
+    return color + rim * rimColor * rimStrength;
+}
 
 float4 psMain(PSInput input) : SV_TARGET
 {

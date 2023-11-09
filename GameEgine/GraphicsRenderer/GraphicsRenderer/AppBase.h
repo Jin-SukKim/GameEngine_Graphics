@@ -92,4 +92,5 @@ public:
 
 	// 눌린 키보드 입력 상태
 	bool m_keyPressed[256] = { false, };
+	bool m_mousePresses[2] = { false, };
 };

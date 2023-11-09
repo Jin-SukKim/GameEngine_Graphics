@@ -121,6 +121,8 @@ void AppBase::OnMouseMove(int mouseX, int mouseY)
 
 	prevX = x;
 	prevY = y;
+
+	std::cout << gapX << ' ' << gapY << '\n';
 	// 카메라 시점 회전
 	//m_camera.MouseRotate(gapX, gapY);
 }
@@ -141,15 +143,20 @@ LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_MOUSEMOVE:
 		//std::cout << "Mouse " << LOWORD(lParam) << " " << HIWORD(lParam) << std::endl;
-		
+		if (m_mousePresses[1])
+			OnMouseMove(LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_LBUTTONUP:
 		// cout << "WM_LBUTTONUP Left mouse button" << endl;
 
 		break;
+	case WM_RBUTTONDOWN:
+		m_mousePresses[1] = true;
+		break;
 	case WM_RBUTTONUP:
 		// cout << "WM_RBUTTONUP Right mouse button" << endl;
 		//OnMouseMove(LOWORD(lParam), HIWORD(lParam));
+		m_mousePresses[1] = false;
 		break;
 	case WM_KEYDOWN:
 		// ESC 누르면 프로그램 종료

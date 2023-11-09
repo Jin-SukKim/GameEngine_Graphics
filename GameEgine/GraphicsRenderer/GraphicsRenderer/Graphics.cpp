@@ -171,6 +171,4 @@ void Graphics::UserInput(float dt)
         m_camera.MoveUp(dt);
     if (m_keyPressed[81]) // a : 아래로 이동
         m_camera.MoveUp(-dt);
-
-
 }

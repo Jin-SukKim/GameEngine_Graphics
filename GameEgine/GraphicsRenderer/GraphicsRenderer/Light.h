@@ -17,3 +17,11 @@ struct Light {
 //	int type = 1;							// 조명 타입 - Directional Light = 0, Point Light = 1, Spot Light = 2
 //	float dummy[3];							// 16byte단위로 전송되기에 더미 데이터
 };
+
+struct RimLight {
+	Vector3 rimColor = Vector3(0.f, 1.f, 0.f);
+	float rimPower = 2.5f;
+	float rimStrength = 1.f;
+	bool useSmoothStep = true;
+	float dummy[2];
+};

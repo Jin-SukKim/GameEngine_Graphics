@@ -20,6 +20,15 @@ struct Light
 //    float3 dummy[3];
 };
 
+struct RimLight
+{
+    // Rim Effect
+    float3 rimColor;
+    float rimPower;
+    float rimStrength;
+    bool useSmoothStep;
+};
+
 // ÀçÁú
 struct Material
 {

@@ -24,6 +24,7 @@ struct MeshPSConstData {
 	bool useTexture;
 	Material material;
 	Light lights[MAX_LIGHTS];
+	RimLight rimLight;
 };
 
 struct MeshNormalConstData {

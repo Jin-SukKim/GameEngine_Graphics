@@ -148,6 +148,7 @@
     <ClCompile Include="..\Lib\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="AppBase.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="D3D11Utils.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="AppBase.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantData.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="D3D11Utils.h" />
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="Graphics.h" />

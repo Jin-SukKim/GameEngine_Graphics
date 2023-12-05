@@ -47,7 +47,4 @@ private:
 	ComPtr<ID3D11Buffer> m_meshVSConstantBuffer;
 	ComPtr<ID3D11Buffer> m_meshPSConstantBuffer;
 	ComPtr<ID3D11Buffer> m_meshNormalConstantBuffer;
-
-	// 그려야되는 Index 개수
-	UINT m_meshIndexCount = 0;
 };

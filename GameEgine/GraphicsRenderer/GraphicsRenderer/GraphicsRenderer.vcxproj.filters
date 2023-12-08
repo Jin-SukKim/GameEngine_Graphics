@@ -68,6 +68,12 @@
     <ClCompile Include="..\Lib\ImGUI\backends\imgui_impl_win32.cpp">
       <Filter>ImGui\backends</Filter>
     </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppBase.h">
@@ -132,6 +138,12 @@
     </ClInclude>
     <ClInclude Include="..\Lib\ImGUI\backends\imgui_impl_win32.h">
       <Filter>ImGui\backends</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMap.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

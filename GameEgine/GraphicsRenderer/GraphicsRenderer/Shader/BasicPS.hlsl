@@ -11,7 +11,24 @@ cbuffer MeshPSConstData : register(b0)
     bool useTexture;    
     Material material;          // 재질
     Light lights[MAX_LIGHTS]; // 조명
+    RimLight rimLights;
 };
+
+// object의 테두리에 빛이 나는 역광 조명 효과
+float3 RimLighting(float3 color, float3 toCam, float3 normal)
+{
+    // 모델의 중심에 가까울수록 dot product의 값은 1.0에 가까워진다. (안으로 갈수록 rim값은 0.0에 가까워진다.)
+    float rim = 1.0f - dot(toCam, normal);
+    
+    // Smoothstep
+    // https://thebookofshaders.com/glossary/?search=smoothstep
+    if (rimLights.useSmoothStep)
+        rim = smoothstep(0.0f, 1.0f, rim); // 내장함수 사용
+    
+    rim = pow(abs(rim), rimLights.rimPower);
+
+    return color + rim * rimLights.rimColor * rimLights.rimStrength;
+}
 
 float4 psMain(PSInput input) : SV_TARGET
 {
@@ -32,5 +49,8 @@ float4 psMain(PSInput input) : SV_TARGET
     for (i = NUM_DIR_LIGHTS + NUM_POINT_LIGHTS; i < NUM_DIR_LIGHTS + NUM_POINT_LIGHTS + NUM_SPOT_LIGHTS; ++i)
         color += SpotLight(lights[i], input.posWorld, input.normalWorld, toCam, material);
      
+    // rim 조명 효과
+    // color = RimLighting(color, toCam, input.normalWorld);
+    
     return useTexture ? float4(color, 1.0) * g_texture0.Sample(g_sampler0, input.texcoord) : float4(color, 1.0f);
 }

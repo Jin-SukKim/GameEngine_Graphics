@@ -24,7 +24,7 @@ protected:
 	bool m_usePerspectiveProjection = true;
 	bool m_wireFrame = false;
 	bool m_useTexture = false;
-	bool m_normalLine = true;
+	bool m_normalLine = false;
 
 	Vector3 modelAxis = {1.f, 0.f, 0.f};
 	Vector3 m_scale = Vector3(0.3f);

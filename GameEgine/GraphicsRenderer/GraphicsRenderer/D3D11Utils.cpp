@@ -6,6 +6,10 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
+// 큐브맵
+#include <directxtk/DDSTextureLoader.h>
+//#include <DDSTextureLoader.h>
+
 // https://learn.microsoft.com/en-us/windows/win32/direct3d11/how-to--compile-a-shader
 void CheckResult(HRESULT hr, ID3DBlob* errorBlob)
 {
@@ -198,4 +202,30 @@ void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& 
 	// 생성한 Texture로 TextureResourceView 생성
 	device->CreateShaderResourceView(texture.Get(), nullptr,
 		textureResourceView.GetAddressOf());
+}
+
+void D3D11Utils::CreateCubeMapTexture(ComPtr<ID3D11Device>& device, const wchar_t* filename, ComPtr<ID3D11ShaderResourceView>& texResView)
+{
+	// .dds 파일 읽어들여서 초기화 (큐브 매핑)
+	ComPtr<ID3D11Texture2D> texture;
+
+	// https://github.com/microsoft/DirectXTK/wiki/DDSTextureLoader
+	// CreateDDSTextureFromFileEx() 함수를 사용해 Texture와
+	// Texture의 ResourceView를 초기화할 수 있다.
+	auto hr = DirectX::CreateDDSTextureFromFileEx(
+		device.Get(), 
+		filename, 
+		0, D3D11_USAGE_DEFAULT,
+		D3D11_BIND_SHADER_RESOURCE, 0,
+		D3D11_RESOURCE_MISC_TEXTURECUBE, // 큐브맵용 텍스춰
+		DirectX::DDS_LOADER_FLAGS(false),
+		// 읽어들인 데이터를 임시로 저장할 Texture
+		// Shader로 넘길 때 ResourceView만 있으면 되기에 Texture는 임시로 사용한다.
+		(ID3D11Resource**)texture.GetAddressOf(),
+		texResView.GetAddressOf(), 
+		nullptr);
+
+	if (FAILED(hr)) {
+		std::cout << "CreateDDSTextureFromFileEx() failed" << std::endl;
+	}
 }

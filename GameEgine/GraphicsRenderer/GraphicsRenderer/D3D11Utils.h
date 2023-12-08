@@ -67,6 +67,12 @@ public:
 		ComPtr<ID3D11Texture2D>& texture,
 		ComPtr<ID3D11ShaderResourceView>& textureResourceView);
 
+	// CubeMap Texture 생성
+	static void CreateCubeMapTexture(
+		ComPtr<ID3D11Device>& device,
+		const wchar_t* filename,
+		ComPtr<ID3D11ShaderResourceView>& texResView);
+
 	// 현재 윈도우 스크린샷
 	static void WriteImage();
 };

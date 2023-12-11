@@ -7,6 +7,7 @@
 #include "Mesh.h"
 #include "MeshData.h"
 #include "ConstantData.h"
+#include "D3D11Utils.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -26,7 +27,7 @@ public:
 	CubeVSConstData m_cubeConstVSbuffer;
 private:
 	// Mesh Data
-	std::shared_ptr<Mesh> cube;
+	std::shared_ptr<Mesh> m_cubeMap;
 
 	// Shader
 	ComPtr<ID3D11InputLayout> m_cubeIL;

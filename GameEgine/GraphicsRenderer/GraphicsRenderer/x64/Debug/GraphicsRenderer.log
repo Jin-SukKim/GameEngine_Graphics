@@ -1,20 +1,5 @@
-﻿  imgui_impl_dx10.cpp
-  imgui_impl_dx11.cpp
-  imgui_impl_dx9.cpp
-  imgui_impl_win32.cpp
-  imgui.cpp
-  imgui_demo.cpp
-  imgui_draw.cpp
-  imgui_tables.cpp
-  imgui_widgets.cpp
-  AppBase.cpp
-  Camera.cpp
-  CubeMap.cpp
-  D3D11Utils.cpp
-  GeometryGenerator.cpp
-  Graphics.cpp
-  main.cpp
+﻿  CubeMap.cpp
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\CubeMap.cpp(7,43): error C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\CubeMap.cpp(8,43): error C4996: 'wcscat': This function or variable may be unsafe. Consider using wcscat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   MeshModel.cpp
-  ModelLoader.cpp
   Generating Code...
-  GraphicsRenderer.vcxproj -> C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\GraphicsRenderer.exe

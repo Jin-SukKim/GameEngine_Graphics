@@ -12,7 +12,7 @@ struct Mesh {
 	ComPtr<ID3D11Buffer> indexBuffer;
 	
 	// Texture
-	ComPtr<ID3D11Texture2D> m_meshTexture; // Texture
+	ComPtr<ID3D11Texture2D> meshTexture; // Texture
 	// Shader Resource View : Texture를 Shader가 Resource로 사용할 수 있는 형식으로 view를 변환
 	// 즉, Resource는 데이터(텍스쳐, 버퍼 등)을 의미하고 Shader는 Resource View를 통해
 	// 데이터에 접근하고 사용하는 방법을 설정한다.(Read, Write 등)
@@ -21,9 +21,9 @@ struct Mesh {
 	// Texture를 shader의 RenderTarget으로 사용 가능하고 다시 다른 Shader에 입력도 가능하다. (입력시 ResourceView로 넣어준다)
 	// 즉, 같은 Texture 메모리 공간이어도 RenderTarget이나 Resource로 사용할 수도 있으므로
 	// 별도의 ResourceView를 만들어 입력으로 넣어준다.
-	ComPtr<ID3D11ShaderResourceView> m_textureResourceView;
-	ComPtr<ID3D11ShaderResourceView> m_diffuseResView;
-	ComPtr<ID3D11ShaderResourceView> m_specularResView;
+	ComPtr<ID3D11ShaderResourceView> textureResourceView;
+	ComPtr<ID3D11ShaderResourceView> diffuseResView;
+	ComPtr<ID3D11ShaderResourceView> specularResView;
 
 	// constant buffers
 	ComPtr<ID3D11Buffer> constantBufferVS;

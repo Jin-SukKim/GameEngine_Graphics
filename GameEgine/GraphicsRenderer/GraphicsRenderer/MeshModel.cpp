@@ -47,7 +47,7 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 		// Texture 생성
 		if (!mData.texturePath.empty()) {
 			D3D11Utils::CreateTexture(device, mData.texturePath,
-				newMesh->m_meshTexture, newMesh->m_textureResourceView);
+				newMesh->meshTexture, newMesh->textureResourceView);
 		}
 
 		// 하나의 모델이므로 같은 constant data 사용
@@ -172,7 +172,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
 		// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
 		ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
 		{
-			mesh->m_textureResourceView.Get()
+			mesh->textureResourceView.Get()
 		};
 		// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
 		context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기

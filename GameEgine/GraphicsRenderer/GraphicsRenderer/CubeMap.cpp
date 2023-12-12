@@ -1,11 +1,58 @@
 #include "CubeMap.h"
+#include "D3D11Utils.h"
+#include "GeometryGenerator.h"
 
-void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const wchar_t* path, const wchar_t* diffuseFilename, const wchar_t* specularFileName)
+void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, const std::wstring diffuseFilename, const std::wstring specularFileName)
 {
 	m_cubeMap = std::make_shared<Mesh>();
-	// .dds 파일 읽어들여서 초기화
-	D3D11Utils::CreateCubeMapTexture(device, path.append(diffuseFilename), m_cubeMap->diffuseResView);
-	D3D11Utils::CreateCubeMapTexture(device, wcscat_s(path, specularFileName), m_cubeMap->specularResView);
+	// .dds 파일 읽어들여서 texture의 resourceView 초기화 (c_str()로 wchar_t*로 변환)
+	D3D11Utils::CreateCubeMapTexture(device, (path + diffuseFilename).c_str(), m_cubeMap->diffuseResView);
+	D3D11Utils::CreateCubeMapTexture(device, (path + specularFileName).c_str(), m_cubeMap->specularResView);
+
+	// Texture Sampler 설정
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	// Sampler State 설정
+	device->CreateSamplerState(&sampDesc, m_samplerState.GetAddressOf());
+
+	// Constant Buffer 생성
+	m_cubeConstVSBufferData.viewProj = Matrix();
+	D3D11Utils::CreateConstantBuffer(device, m_cubeConstVSBufferData, m_cubeVSConstantBuffer);
+
+	// mesh 생성
+	MeshData mesh = GeometryGenerator::MakeCube(20.f);
+	//MeshData mesh = GeometryGenerator::MakeSphere(20.f, 20, 20);
+
+	// mesh의 index 순서를 반대로해 뒷면과 앞면을 바꿔 cubeMap 내부가 rendering되도록 한다.
+	std::reverse(mesh.indices.begin(), mesh.indices.end());
+
+	// mesh의 버퍼 생성 후 GPU로 복사
+	D3D11Utils::CreateVertexBuffer(device, mesh.vertices, m_cubeMap->vertexBuffer);
+	D3D11Utils::CreateVertexBuffer(device, mesh.indices, m_cubeMap->indexBuffer);
+	m_cubeMap->indexCount = (UINT)mesh.indices.size();
+
+	// Shader 생성
+	
+	// InputLayer 데이터 Format 설정
+	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 4 * 3, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 4 * 6, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	// InputLayout & Vertex Shader 생성
+	D3D11Utils::CreateVSAndInputLayout(device, L"Shader/CubeMapVS.hlsl", inputElements,
+		m_cubeVS, m_cubeIL);
+	// Pixel Shader 생성
+	D3D11Utils::CreatePS(device, L"Shader/CubeMapPS.hlsl", m_cubePS);
 }
 
 void CubeMap::UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context)

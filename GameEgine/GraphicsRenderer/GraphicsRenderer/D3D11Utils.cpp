@@ -10,6 +10,7 @@
 #include <directxtk/DDSTextureLoader.h>
 //#include <DDSTextureLoader.h>
 
+
 // https://learn.microsoft.com/en-us/windows/win32/direct3d11/how-to--compile-a-shader
 void CheckResult(HRESULT hr, ID3DBlob* errorBlob)
 {
@@ -212,18 +213,22 @@ void D3D11Utils::CreateCubeMapTexture(ComPtr<ID3D11Device>& device, const wchar_
 	// https://github.com/microsoft/DirectXTK/wiki/DDSTextureLoader
 	// CreateDDSTextureFromFileEx() 함수를 사용해 Texture와
 	// Texture의 ResourceView를 초기화할 수 있다.
+	// Ex 버전은 flags를 통해 resource(텍스쳐)를 어떻게 사용할지도 control할 수 있다.
 	auto hr = DirectX::CreateDDSTextureFromFileEx(
 		device.Get(), 
-		filename, 
-		0, D3D11_USAGE_DEFAULT,
-		D3D11_BIND_SHADER_RESOURCE, 0,
-		D3D11_RESOURCE_MISC_TEXTURECUBE, // 큐브맵용 텍스춰
-		DirectX::DDS_LOADER_FLAGS(false),
+		filename, // dds 텍스쳐
+		0,	// maxsize
+		D3D11_USAGE_DEFAULT,	
+		D3D11_BIND_SHADER_RESOURCE, 
+		0,	// cpu access flag
+		D3D11_RESOURCE_MISC_TEXTURECUBE, // 큐브맵용 텍스춰 (misc flag)
+		DirectX::DDS_LOADER_FLAGS(false),	// load flag
 		// 읽어들인 데이터를 임시로 저장할 Texture
 		// Shader로 넘길 때 ResourceView만 있으면 되기에 Texture는 임시로 사용한다.
 		(ID3D11Resource**)texture.GetAddressOf(),
 		texResView.GetAddressOf(), 
-		nullptr);
+		nullptr	// alpha mode
+	);
 
 	if (FAILED(hr)) {
 		std::cout << "CreateDDSTextureFromFileEx() failed" << std::endl;

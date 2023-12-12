@@ -4,7 +4,7 @@
 #include <iostream>
 #include "ModelLoader.h"
 
-MeshData GeometryGenerator::MakeCube()
+MeshData GeometryGenerator::MakeCube(const float scale)
 {
     std::vector<Vector3> positions;
     std::vector<Vector3> colors;
@@ -12,10 +12,10 @@ MeshData GeometryGenerator::MakeCube()
     std::vector<Vector2> texcoords; // ÅØ½ºÃç ÁÂÇ¥
 
     // À­¸é
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f));
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f));
+    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
     colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
     colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
     colors.push_back(Vector3(1.0f, 0.0f, 0.0f));
@@ -30,10 +30,10 @@ MeshData GeometryGenerator::MakeCube()
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
     // ¾Æ·§¸é
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f));
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f));
+    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
     colors.push_back(Vector3(0.0f, 1.0f, 0.0f));
     colors.push_back(Vector3(0.0f, 1.0f, 0.0f));
     colors.push_back(Vector3(0.0f, 1.0f, 0.0f));
@@ -48,10 +48,10 @@ MeshData GeometryGenerator::MakeCube()
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
     // ¾Õ¸é
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f));
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f));
+    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
     colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
     colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
     colors.push_back(Vector3(0.0f, 0.0f, 1.0f));
@@ -66,10 +66,10 @@ MeshData GeometryGenerator::MakeCube()
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
     // µÞ¸é
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f));
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f));
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f));
+    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
     colors.push_back(Vector3(0.0f, 1.0f, 1.0f));
     colors.push_back(Vector3(0.0f, 1.0f, 1.0f));
     colors.push_back(Vector3(0.0f, 1.0f, 1.0f));
@@ -84,10 +84,10 @@ MeshData GeometryGenerator::MakeCube()
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
     // ¿ÞÂÊ
-    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f));
-    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f));
-    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f));
-    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f));
+    positions.push_back(Vector3(-1.0f, -1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, 1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, 1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(-1.0f, -1.0f, -1.0f) * scale);
     colors.push_back(Vector3(1.0f, 1.0f, 0.0f));
     colors.push_back(Vector3(1.0f, 1.0f, 0.0f));
     colors.push_back(Vector3(1.0f, 1.0f, 0.0f));
@@ -102,10 +102,10 @@ MeshData GeometryGenerator::MakeCube()
     texcoords.push_back(Vector2(0.0f, 1.0f));
 
     // ¿À¸¥ÂÊ
-    positions.push_back(Vector3(1.0f, -1.0f, 1.0f));
-    positions.push_back(Vector3(1.0f, -1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, -1.0f));
-    positions.push_back(Vector3(1.0f, 1.0f, 1.0f));
+    positions.push_back(Vector3(1.0f, -1.0f, 1.0f) * scale);
+    positions.push_back(Vector3(1.0f, -1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, -1.0f) * scale);
+    positions.push_back(Vector3(1.0f, 1.0f, 1.0f)* scale);
     colors.push_back(Vector3(1.0f, 0.0f, 1.0f));
     colors.push_back(Vector3(1.0f, 0.0f, 1.0f));
     colors.push_back(Vector3(1.0f, 0.0f, 1.0f));
@@ -145,16 +145,16 @@ MeshData GeometryGenerator::MakeCube()
     return Cube;
 }
 
-MeshData GeometryGenerator::MakeTriangle()
+MeshData GeometryGenerator::MakeTriangle(const float scale)
 {
     std::vector<Vector3> pos;
     std::vector<Vector3> color;
     std::vector<Vector3> normal;
     std::vector<Vector2> texcoord;
 
-    pos.push_back(Vector3(-1.f, -1.f, 0.f));
-    pos.push_back(Vector3(0.f, 1.f, 0.f));
-    pos.push_back(Vector3(1.f, -1.f, 0.f));
+    pos.push_back(Vector3(-1.f, -1.f, 0.f) * scale);
+    pos.push_back(Vector3(0.f, 1.f, 0.f) * scale);
+    pos.push_back(Vector3(1.f, -1.f, 0.f) * scale);
 
     color.push_back(Vector3(1.f, 0.f, 0.f));
     color.push_back(Vector3(0.f, 1.f, 0.f));
@@ -190,17 +190,17 @@ MeshData GeometryGenerator::MakeTriangle()
     return triangle;
 }
 
-MeshData GeometryGenerator::MakeSquare()
+MeshData GeometryGenerator::MakeSquare(const float scale)
 {
     std::vector<Vector3> pos;
     std::vector<Vector3> color;
     std::vector<Vector3> normal;
     std::vector<Vector2> texcoord;
 
-    pos.push_back(Vector3(-1.f, -1.f, 0.f));
-    pos.push_back(Vector3(-1.f, 1.f, 0.f));
-    pos.push_back(Vector3(1.f, 1.f, 0.f));
-    pos.push_back(Vector3(1.f, -1.f, 0.f));
+    pos.push_back(Vector3(-1.f, -1.f, 0.f) * scale);
+    pos.push_back(Vector3(-1.f, 1.f, 0.f) * scale);
+    pos.push_back(Vector3(1.f, 1.f, 0.f) * scale);
+    pos.push_back(Vector3(1.f, -1.f, 0.f) * scale);
 
     color.push_back(Vector3(1.f, 0.f, 0.f));
     color.push_back(Vector3(0.f, 1.f, 0.f));

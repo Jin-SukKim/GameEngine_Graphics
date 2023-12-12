@@ -12,12 +12,14 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
 	// Filtering은 Linear Interpolation으로 설정
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	// Texture 경계 밖에 있는 텍스쳐 좌표 확인 방법
 	// wrap/crap/mirror 등 옵션 설정 가능
 	// Texture도 2D Texture, 3D Textrue가 있기 때문에 W 좌표까지 사용 가능
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; // x
 	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP; // y
 	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP; // z
 	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	// LOD(Level Of Detail) - 주로 거리 기반으로 사용
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 

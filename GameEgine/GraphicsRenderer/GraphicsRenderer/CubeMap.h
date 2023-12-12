@@ -3,11 +3,11 @@
 #include <memory>
 #include <wrl.h>
 #include <d3d11.h>
+#include <string>
 
 #include "Mesh.h"
 #include "MeshData.h"
 #include "ConstantData.h"
-#include "D3D11Utils.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -16,15 +16,15 @@ using Microsoft::WRL::ComPtr;
 class CubeMap {
 public:
 	// CubeMap 생성 (.dds 파일을 읽어서 초기화)
-	void Initialize(ComPtr<ID3D11Device>& device, const wchar_t* path,
-		const wchar_t* diffuseFilename, const wchar_t* specularFileName);
+	void Initialize(ComPtr<ID3D11Device>& device, const std::wstring path,
+		const std::wstring diffuseFilename, const std::wstring specularFileName);
 	// CubeMap의 ViewProj buffer Update
 	void UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context);
 	// CubeMap Rendering (효율성을 위해 가장 마지막에 Rendering하는 것이 권장된다.)
 	void Render(ComPtr<ID3D11DeviceContext>& context);
 
 public:
-	CubeVSConstData m_cubeConstVSbuffer;
+	CubeVSConstData m_cubeConstVSBufferData;
 private:
 	// Mesh Data
 	std::shared_ptr<Mesh> m_cubeMap;

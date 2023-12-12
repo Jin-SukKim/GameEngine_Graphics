@@ -7,11 +7,11 @@
 class GeometryGenerator {
 public:
 	// 정육면체 생성
-	static MeshData MakeCube();
+	static MeshData MakeCube(const float scale = 1.f);
 	// 삼각형 생성
-	static MeshData MakeTriangle();
+	static MeshData MakeTriangle(const float scale = 1.f);
 	// 사각형 생성
-	static MeshData MakeSquare();
+	static MeshData MakeSquare(const float scale = 1.f);
 	// 여러 삼각형으로 원 생성
 	static MeshData MakeCircle(const float& radius = 1.f, const int& numTriangles = 50, const Vector3& color = Vector3(1.f, 1.f, 1.f));
 	// Grid 생성

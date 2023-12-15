@@ -6,7 +6,6 @@ struct PSInput
 {
     float4 posProj : SV_POSITION; // screen 좌표계의 위치
     float3 posWorld : POSITION;
-    float2 texcoord : TEXCOORD;
 };
 
 float4 psMain(PSInput input) : SV_TARGET

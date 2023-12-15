@@ -17,9 +17,9 @@ class CubeMap {
 public:
 	// CubeMap 생성 (.dds 파일을 읽어서 초기화)
 	void Initialize(ComPtr<ID3D11Device>& device, const std::wstring path,
-		const std::wstring diffuseFilename, const std::wstring specularFileName);
+		const std::wstring originalFilename, const std::wstring diffuseFilename, const std::wstring specularFileName);
 	// CubeMap의 ViewProj buffer Update
-	void UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context);
+	void UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, const Matrix& view, const Matrix& proj);
 	// CubeMap Rendering (효율성을 위해 가장 마지막에 Rendering하는 것이 권장된다.)
 	void Render(ComPtr<ID3D11DeviceContext>& context);
 
@@ -36,11 +36,6 @@ private:
 	
 	// Texture Sampler
 	ComPtr<ID3D11SamplerState> m_samplerState;
-
-	// Buffers
-	ComPtr<ID3D11Buffer> m_cubeVSConstantBuffer;
-	// 기본적인 CubeMap에는 필요없으나 Animation Texture 기술을 결합하면 필요하다.
-	ComPtr<ID3D11Buffer> m_cubePSConstantBuffer;
 
 	UINT m_cubeIndexCount = 0;
 };

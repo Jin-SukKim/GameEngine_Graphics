@@ -1,5 +1,9 @@
-﻿  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapPS.cso
-C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Shader\CubeMapVS.hlsl(23,14-29): warning X3578: Output value 'vsMain' is not completely initialized
-C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Shader\CubeMapVS.hlsl(23,14-29): error X4580: Output variable vsMain contains a system-interpreted value (SV_POSITION) which must be written in every execution path of the shader.  Unconditional initialization may help.
-  
-  compilation failed; no code produced
+﻿  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapVS.cso
+  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\NormalVS.cso
+  CubeMap.cpp
+  D3D11Utils.cpp
+  GeometryGenerator.cpp
+  Graphics.cpp
+  MeshModel.cpp
+  Generating Code...
+  GraphicsRenderer.vcxproj -> C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\GraphicsRenderer.exe

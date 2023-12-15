@@ -13,6 +13,12 @@
       <FullPath>C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\BasicVS.cso</FullPath>
     </ContentFile>
     <ContentFile>
+      <FullPath>C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapPS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapVS.cso</FullPath>
+    </ContentFile>
+    <ContentFile>
       <FullPath>C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\NormalPS.cso</FullPath>
     </ContentFile>
     <ContentFile>

@@ -29,7 +29,7 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 	device->CreateSamplerState(&sampDesc, m_samplerState.GetAddressOf());
 
 	// Constant Buffer 생성
-	m_constantVSBufferData.world = Matrix(); // World 행렬
+	m_constantVSBufferData.model = Matrix(); // Model 행렬
 	m_constantVSBufferData.view = Matrix(); // View 행렬
 	m_constantVSBufferData.proj = Matrix(); // Projection 행렬
 	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
@@ -49,7 +49,7 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 		// Texture 생성
 		if (!mData.texturePath.empty()) {
 			D3D11Utils::CreateTexture(device, mData.texturePath,
-				newMesh->meshTexture, newMesh->textureResourceView);
+				newMesh->meshTexture, newMesh->txtResView);
 		}
 
 		// 하나의 모델이므로 같은 constant data 사용
@@ -169,15 +169,15 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal)
 		context->VSSetConstantBuffers(0, 1, mesh->constantBufferVS.GetAddressOf());
 
 		// Pixel Shader에 Texture와 Sampler를 넘겨준다.
-		// Texture Data는 TextureResourceView로 Shader에서 사용하는 Resource의
+		// Texture Data는 txtResView로 Shader에서 사용하는 Resource의
 		// 실질적 데이터가 들어가 있다.
 		// 퀄리티가 좋은 Texture의 경우 여러 Texture를 함께 사용하는 경우가 많아 배열로 만들어 넘긴다.
 		ComPtr<ID3D11ShaderResourceView> pixelResources[2] =
 		{
-			mesh->textureResourceView.Get()
+			mesh->txtResView.Get()
 		};
 		// 현재 ResourceView와 사용할 Texture가 1개라 1로 설정
-		context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // TextureResourceView 넘기기
+		context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf()); // txtResView 넘기기
 		context->PSSetConstantBuffers(0, 1, mesh->constantBufferPS.GetAddressOf());
 
 		// Input Layout 설정

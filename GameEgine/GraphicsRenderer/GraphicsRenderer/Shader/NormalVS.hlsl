@@ -2,7 +2,7 @@
 // Constant buffer
 cbuffer MeshVSConstData : register(b0) // buffer는 register b 사용
 {
-    matrix world;
+    matrix model;
     matrix invTranspose;
     matrix view;
     matrix proj;
@@ -19,8 +19,8 @@ PSInput vsMain(VSInput input)
 {
     PSInput output;
     
-    float4 pos = float4(input.posWorld, 1.0);
-    pos = mul(pos, world);
+    float4 pos = float4(input.posModel, 1.0);
+    pos = mul(pos, model); // 월드 좌표계로 변환
     
     // Normal Vector의 방향을 알아야 선분의 끝점을 그릴 수 있다.
     float4 normal = float4(input.normalWorld, 0.0f);

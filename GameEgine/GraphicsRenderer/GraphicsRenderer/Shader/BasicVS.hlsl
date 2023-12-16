@@ -2,7 +2,7 @@
 // Constant buffer
 cbuffer MeshVSConstData : register(b0) // buffer는 register b 사용
 {
-    matrix world;
+    matrix model;
     matrix invTranspose; 
     matrix view;
     matrix proj;
@@ -12,13 +12,13 @@ PSInput vsMain(VSInput input)
 {
     PSInput output;
     
-    float4 pos = float4(input.posWorld, 1.0);
-    pos = mul(pos, world);
+    float4 pos = float4(input.posModel, 1.0); // 모델 좌표계
+    pos = mul(pos, model);  // 모델 행렬을 곱해 월드 좌표계로 변환
     
-    output.posWorld = pos.xyz;
+    output.posWorld = pos.xyz; // 월드 좌표계
     
-    pos = mul(pos, view);
-    pos = mul(pos, proj);
+    pos = mul(pos, view); // 뷰 좌표계로 변환
+    pos = mul(pos, proj); // 스크린 좌표계로 변환
     
     output.posProj = pos;
     output.color = float3(0.0, 0.0, 0.0);

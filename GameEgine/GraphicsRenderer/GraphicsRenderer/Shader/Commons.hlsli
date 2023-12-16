@@ -140,7 +140,7 @@ float3 SpotLight(Light L, float3 pos, float3 normal, float3 toCam, Material mat)
 // Vertex Shader Input ±¸Á¶Ã¼
 struct VSInput
 {
-    float3 posWorld : POSITION;
+    float3 posModel : POSITION;
     float3 color : COLOR0;
     float3 normalWorld : NORMAL;
     float2 texcoord : TEXCOORD;

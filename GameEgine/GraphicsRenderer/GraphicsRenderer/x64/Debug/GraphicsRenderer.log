@@ -1,9 +1,3 @@
-﻿  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapVS.cso
-  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\NormalVS.cso
-  CubeMap.cpp
-  D3D11Utils.cpp
-  GeometryGenerator.cpp
-  Graphics.cpp
-  MeshModel.cpp
-  Generating Code...
+﻿  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapPS.cso
+  compilation object save succeeded; see C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\CubeMapVS.cso
   GraphicsRenderer.vcxproj -> C:\Study\Project\GameEgine\GraphicsRenderer\x64\Debug\GraphicsRenderer.exe

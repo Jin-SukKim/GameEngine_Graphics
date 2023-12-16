@@ -21,7 +21,7 @@ struct Mesh {
 	// Texture를 shader의 RenderTarget으로 사용 가능하고 다시 다른 Shader에 입력도 가능하다. (입력시 ResourceView로 넣어준다)
 	// 즉, 같은 Texture 메모리 공간이어도 RenderTarget이나 Resource로 사용할 수도 있으므로
 	// 별도의 ResourceView를 만들어 입력으로 넣어준다.
-	ComPtr<ID3D11ShaderResourceView> textureResourceView;
+	ComPtr<ID3D11ShaderResourceView> txtResView;
 	ComPtr<ID3D11ShaderResourceView> diffuseResView;
 	ComPtr<ID3D11ShaderResourceView> specularResView;
 

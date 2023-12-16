@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "MeshModel.h"
+#include "CubeMap.h"
 
 class Graphics : public AppBase {
 public:
@@ -18,6 +19,7 @@ public:
 
 protected:
 	MeshModel m_mesh;
+	CubeMap m_cubeMap;
 
 	// ImGUI parameters
 	// 원근 투영을 사용할 것인지

@@ -11,18 +11,27 @@ bool Graphics::Initialize()
 {
 	if (!AppBase::Initialize())
 		return false;
+    
+    // Cubemap 생성
+    {
+        m_cubeMap.Initialize(m_device, L".\\..\\Assets\\Textures\\Cubemaps\\skybox\\", 
+            L"cubemap_bgra.dds", L"cubemap_diffuse.dds", L"cubemap_specular.dds");
+    }
 
     // 기본 모델 생성
     {
         // Geometry 정의
         //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
-        //MeshData square = GeometryGenerator::MakeSphere(1.5f, 15, 15);
+        MeshData mesh = GeometryGenerator::MakeSphere(0.5f, 15, 15);
         //square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
         //m_mesh.Initialize(m_device, { square });
+        /*
         m_mesh.Initialize(
             m_device, 
             "C:/Study/Project/GameEgine/GraphicsRenderer/Assets/Models/f3d-data/zelda-breath-of-the-wild/source/zeldaPosed001/",
             "zeldaPosed001.fbx");
+        */
+        m_mesh.Initialize(m_device, { mesh });
     }
 
 	return true;
@@ -34,16 +43,16 @@ void Graphics::Update(float dt)
     using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_rotation);
-    Matrix world = Matrix::CreateScale(m_scale)
+    Matrix model = Matrix::CreateScale(m_scale)
         * Matrix::CreateFromQuaternion(q)
         * Matrix::CreateTranslation(m_translation);
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
-    m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
+    m_mesh.m_constantVSBufferData.model = model.Transpose(); // Row-Major -> Column-Major 변환
 
-    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.world;
+    m_mesh.m_constantVSBufferData.invModel = m_mesh.m_constantVSBufferData.model;
     // 오류 방지
-    m_mesh.m_constantVSBufferData.invWorld.Translation(Vector3(0.f));
-    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.invWorld.Transpose().Invert();
+    m_mesh.m_constantVSBufferData.invModel.Translation(Vector3(0.f));
+    m_mesh.m_constantVSBufferData.invModel = m_mesh.m_constantVSBufferData.invModel.Transpose().Invert();
 
     // 카메라의 이동
     UserInput(dt);
@@ -61,6 +70,7 @@ void Graphics::Update(float dt)
     m_mesh.m_constantPSBufferData.material.diffuse = Vector3(m_diffuse);
     m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
 
+    // Light
     // 여러개의 조명을 사용할 때
     for (int i = 0; i < MAX_LIGHTS; i++) {
         // 다른 조명 끄기
@@ -76,6 +86,9 @@ void Graphics::Update(float dt)
     {   
         m_mesh.m_constantNormalBufferData.scale = m_normalScale;
     }
+
+    // CubeMapping
+    m_cubeMap.UpdateConstantBuffer(m_context, view.Transpose(), proj.Transpose());
 
     m_mesh.UpdateConstantBuffers(m_context);
 }
@@ -115,7 +128,11 @@ void Graphics::Render()
     else
         m_context->RSSetState(m_SolidRasterizerState.Get());
     
+    // mesh 렌더링
     m_mesh.Render(m_context, m_normalLine);
+
+    // cubeMap 렌더링
+    m_cubeMap.Render(m_context);
 }
 
 void Graphics::UpdateGUI()

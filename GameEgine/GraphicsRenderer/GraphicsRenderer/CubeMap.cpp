@@ -5,9 +5,16 @@
 void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, const std::wstring originalFilename, const std::wstring diffuseFilename, const std::wstring specularFileName)
 {
 	m_cubeMap = std::make_shared<Mesh>();
+	// mesh 생성
+	//MeshData mesh = GeometryGenerator::MakeCube(20.f);
+	MeshData mesh = GeometryGenerator::MakeSphere(20.f, 100, 100);
+
+	// mesh의 index 순서를 반대로해 뒷면과 앞면을 바꿔 cubeMap 내부가 rendering되도록 한다.
+	std::reverse(mesh.indices.begin(), mesh.indices.end());
+
 	// .dds 파일 읽어들여서 texture의 resourceView 초기화 (c_str()로 wchar_t*로 변환)
 	// Pre-filter가 되지 않은 원본 Texture
-	D3D11Utils::CreateCubeMapTexture(device, (path + originalFilename).c_str(), m_cubeMap->textureResourceView);
+	D3D11Utils::CreateCubeMapTexture(device, (path + originalFilename).c_str(), m_cubeMap->txtResView);
 	// // IBL(Image-Based Lighting)을 위해 다른 물체들 그릴때 사용    
 	D3D11Utils::CreateCubeMapTexture(device, (path + diffuseFilename).c_str(), m_cubeMap->diffuseResView);
 	D3D11Utils::CreateCubeMapTexture(device, (path + specularFileName).c_str(), m_cubeMap->specularResView);
@@ -30,16 +37,9 @@ void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, 
 	m_cubeConstVSBufferData.viewProj = Matrix();
 	D3D11Utils::CreateConstantBuffer(device, m_cubeConstVSBufferData, m_cubeMap->constantBufferVS);
 
-	// mesh 생성
-	MeshData mesh = GeometryGenerator::MakeCube(20.f);
-	//MeshData mesh = GeometryGenerator::MakeSphere(20.f, 20, 20);
-
-	// mesh의 index 순서를 반대로해 뒷면과 앞면을 바꿔 cubeMap 내부가 rendering되도록 한다.
-	std::reverse(mesh.indices.begin(), mesh.indices.end());
-
 	// mesh의 버퍼 생성 후 GPU로 복사
 	D3D11Utils::CreateVertexBuffer(device, mesh.vertices, m_cubeMap->vertexBuffer);
-	D3D11Utils::CreateVertexBuffer(device, mesh.indices, m_cubeMap->indexBuffer);
+	D3D11Utils::CreateIndexBuffer(device, mesh.indices, m_cubeMap->indexBuffer);
 	m_cubeMap->indexCount = (UINT)mesh.indices.size();
 
 	// Shader 생성
@@ -60,31 +60,33 @@ void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, 
 
 void CubeMap::UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, const Matrix& view, const Matrix& proj)
 {
-	m_cubeConstVSBufferData.viewProj = view * proj;
+	// Transpose 해서 들어온 값
+	m_cubeConstVSBufferData.viewProj = proj * view;
 	// 기본적인 CubeMap에는 Pixel Shader의 ConstantBuffer는 필요없으나 Animation Texture 기술을 결합하면 필요하다.
 	D3D11Utils::UpdateBuffer(context, m_cubeConstVSBufferData, m_cubeMap->constantBufferVS);
 }
 
 void CubeMap::Render(ComPtr<ID3D11DeviceContext>& context)
 {
-	context->VSSetShader(m_cubeVS.Get(), 0, 0);
-	context->PSSetShader(m_cubePS.Get(), 0, 0);
-	context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
-
 	// Vertex Buffer의 단위와 offset 설정
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-
-	context->VSSetConstantBuffers(0, 1, m_cubeMap->constantBufferVS.GetAddressOf());
-
-	ComPtr<ID3D11ShaderResourceView> pixelResources[1] = {
-		m_cubeMap->textureResourceView.Get()
-	};
-
-	context->PSSetShaderResources(0, 1, pixelResources->GetAddressOf());
 
 	context->IASetInputLayout(m_cubeIL.Get());
 	context->IASetVertexBuffers(0, 1, m_cubeMap->vertexBuffer.GetAddressOf(), &stride, &offset);
 	context->IASetIndexBuffer(m_cubeMap->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+	context->VSSetShader(m_cubeVS.Get(), 0, 0);
+	context->VSSetConstantBuffers(0, 1, m_cubeMap->constantBufferVS.GetAddressOf());
+	
+	ID3D11ShaderResourceView* pixelResources[1] = {
+		m_cubeMap->txtResView.Get()
+	};
+
+	context->PSSetShader(m_cubePS.Get(), 0, 0);
+	context->PSSetShaderResources(0, 1, pixelResources);
+	context->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
+
+	context->DrawIndexed(m_cubeMap->indexCount, 0, 0);
 }

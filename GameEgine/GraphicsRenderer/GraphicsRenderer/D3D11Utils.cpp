@@ -168,7 +168,7 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 }
 
 void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& filename,
-	ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& textureResourceView)
+	ComPtr<ID3D11Texture2D>& texture, ComPtr<ID3D11ShaderResourceView>& txtResView)
 {
 	if (filename.empty())
 		return;
@@ -200,9 +200,9 @@ void D3D11Utils::CreateTexture(ComPtr<ID3D11Device>& device, const std::string& 
 
 	// 읽어온 이미지 데이터를 사용해 Texture 생성
 	device->CreateTexture2D(&txtDesc, &initData, texture.GetAddressOf());
-	// 생성한 Texture로 TextureResourceView 생성
+	// 생성한 Texture로 txtResView 생성
 	device->CreateShaderResourceView(texture.Get(), nullptr,
-		textureResourceView.GetAddressOf());
+		txtResView.GetAddressOf());
 }
 
 void D3D11Utils::CreateCubeMapTexture(ComPtr<ID3D11Device>& device, const wchar_t* filename, ComPtr<ID3D11ShaderResourceView>& texResView)

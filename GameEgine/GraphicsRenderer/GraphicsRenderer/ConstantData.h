@@ -13,8 +13,8 @@ using DirectX::SimpleMath::Matrix;
 // 16 byte 단위 (float 4개) 단위로 전송
 // Matrix = XMFLOAT4 = float 4개
 struct MeshVSConstData {
-	Matrix world;	 // Model을 world space 좌표로 변환
-	Matrix invWorld; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용
+	Matrix model;	 // Model을 world space 좌표로 변환
+	Matrix invModel; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용 (월드 좌표계에서 모델 좌표계로 변환하기 위한 행렬)
 	Matrix view;	 // View 좌표계로 변환
 	Matrix proj;	 // Projection 좌표계로 변환
 };

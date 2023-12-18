@@ -4,8 +4,7 @@ cbuffer MeshVSConstData : register(b0) // buffer는 register b 사용
 {
     matrix model;
     matrix invTranspose;
-    matrix view;
-    matrix proj;
+    matrix viewProj;
 };
 
 cbuffer MeshNormalConstData : register(b1)
@@ -37,8 +36,7 @@ PSInput vsMain(VSInput input)
     
     output.posWorld = pos.xyz; // 월드 좌표계
     
-    pos = mul(pos, view);
-    pos = mul(pos, proj);
+    pos = mul(pos, viewProj);
     
     output.posProj = pos;
     output.texcoord = input.texcoord;

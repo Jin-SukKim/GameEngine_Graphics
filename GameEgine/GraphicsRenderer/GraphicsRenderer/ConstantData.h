@@ -15,8 +15,11 @@ using DirectX::SimpleMath::Matrix;
 struct MeshVSConstData {
 	Matrix model;	 // Model을 world space 좌표로 변환
 	Matrix invModel; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용 (월드 좌표계에서 모델 좌표계로 변환하기 위한 행렬)
+	/*
 	Matrix view;	 // View 좌표계로 변환
 	Matrix proj;	 // Projection 좌표계로 변환
+	*/
+	Matrix viewProj; // view와 proj 좌표계 변환을 한번에 수행 (CPU -> GPU 복사를 최소화하는 것이 좋다)
 };
 static_assert((sizeof(MeshVSConstData) % 16) == 0,
 	"Constant Buffer size must be 16-byte aligned");

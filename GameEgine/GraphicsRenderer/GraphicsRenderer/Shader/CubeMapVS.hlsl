@@ -22,8 +22,8 @@ cbuffer MeshVSConstData : register(b0) // buffer는 register b 사용
 PSInput vsMain(VSInput input)
 {
     PSInput output;
-    output.posModel = input.posModel;
-    output.posProj = mul(float4(input.posModel, 1.0f), viewProj);
+    output.posModel = input.posModel; // 모델 좌표계
+    output.posProj = mul(float4(input.posModel, 1.0f), viewProj); // 스크린 좌표계로 변환
     
     return output;
 }

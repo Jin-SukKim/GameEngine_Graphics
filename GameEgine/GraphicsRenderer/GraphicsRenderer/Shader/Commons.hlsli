@@ -38,7 +38,8 @@ struct Material
     float dummy1;
     float3 specular;
     float dummy2;
-    
+    float3 fresnelR0;
+    float dummy3;
 };
 
 float3 BlinnPhong(float3 lightDir, float3 normal, float3 toCam,

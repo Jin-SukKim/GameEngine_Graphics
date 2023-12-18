@@ -22,15 +22,18 @@ bool Graphics::Initialize()
     {
         // Geometry Á¤ÀÇ
         //MeshData square = GeometryGenerator::MakeGrid(2.0f, 1.7f, 100, 70);
-        MeshData mesh = GeometryGenerator::MakeSphere(0.5f, 15, 15);
         //square.texturePath = "../Assets/Textures/blender_uv_grid_2k.png";
         //m_mesh.Initialize(m_device, { square });
+        MeshData mesh = GeometryGenerator::MakeSphere(0.5f, 100, 100);
+        mesh.texturePath = "./../Assets/Textures/earth.jpg";
+        
         /*
         m_mesh.Initialize(
             m_device, 
             "C:/Study/Project/GameEgine/GraphicsRenderer/Assets/Models/f3d-data/zelda-breath-of-the-wild/source/zeldaPosed001/",
             "zeldaPosed001.fbx");
-        */
+            */
+        
         m_mesh.Initialize(m_device, { mesh });
     }
 
@@ -59,13 +62,14 @@ void Graphics::Update(float dt)
 
     //Matrix view = m_camera.GetFocusViewRowMatrix();
     Matrix view = m_camera.GetFPPViewRowMatrix();
-    m_mesh.m_constantVSBufferData.view = view.Transpose();
+    //m_mesh.m_constantVSBufferData.view = view.Transpose();
 
     Matrix proj = m_camera.GetProjRowMatrix();
-    m_mesh.m_constantVSBufferData.proj = proj.Transpose();
+    //m_mesh.m_constantVSBufferData.proj = proj.Transpose();
+    m_mesh.m_constantVSBufferData.viewProj = (view * proj).Transpose();
 
     m_mesh.m_constantPSBufferData.camWorld = m_camera.GetCameraPos();
-    m_mesh.m_constantPSBufferData.useTexture = m_useTexture;
+    m_mesh.m_constantPSBufferData.useTexture = m_mesh.useTexture;
     m_mesh.m_constantPSBufferData.material.shininess = m_shininess;
     m_mesh.m_constantPSBufferData.material.diffuse = Vector3(m_diffuse);
     m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
@@ -82,9 +86,9 @@ void Graphics::Update(float dt)
         }
     }
 
-    if (m_normalLine)
+    if (m_mesh.drawNormal)
     {   
-        m_mesh.m_constantNormalBufferData.scale = m_normalScale;
+        m_mesh.m_constantNormalBufferData.scale = m_mesh.normalScale;
     }
 
     // CubeMapping
@@ -129,7 +133,7 @@ void Graphics::Render()
         m_context->RSSetState(m_SolidRasterizerState.Get());
     
     // mesh ·»´õ¸µ
-    m_mesh.Render(m_context, m_normalLine);
+    m_mesh.Render(m_context, m_cubeMap);
 
     // cubeMap ·»´õ¸µ
     m_cubeMap.Render(m_context);
@@ -139,19 +143,19 @@ void Graphics::UpdateGUI()
 {
     ImGui::Checkbox("WireFrame", &m_wireFrame);
     ImGui::Checkbox("Use PerspectiveProjection", &m_usePerspectiveProjection);
-    ImGui::Checkbox("Use Texture", &m_useTexture);
-    ImGui::Checkbox("Draw Normal Vector", &m_normalLine);
+    ImGui::Checkbox("Use Texture", &m_mesh.useTexture);
+    ImGui::Checkbox("Draw Normal Vector", &m_mesh.drawNormal);
 
     ImGui::SliderFloat3("Scale", &m_scale.x, 0.f, 10.f);
     
     ImGui::SliderFloat3("Model Translation", &m_translation.x, -3.14f, 3.14f);
     ImGui::SliderFloat3("Model Rotation", &m_rotation.x, -3.14f, 3.14f);
 
-    ImGui::SliderFloat("Material Shininess", &m_shininess, 0.f, 256.f);
+    ImGui::SliderFloat("Material Shininess", &m_shininess, 0.f, 10.f);
     ImGui::SliderFloat("Material Diffuse Color", &m_diffuse, 0.f, 1.f);
     ImGui::SliderFloat("Material Specular Color", &m_specular, 0.f, 1.f);
 
-    ImGui::SliderFloat("Normal Vector Scale", &m_normalScale, 0.0f, 1.f);
+    ImGui::SliderFloat("Normal Vector Scale", &m_mesh.normalScale, 0.0f, 1.f);
 
     if (ImGui::RadioButton("Directional Light", lightType == 0)) {
         lightType = 0;

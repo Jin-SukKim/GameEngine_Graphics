@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "MeshData.h"
 #include "ConstantData.h"
+#include "CubeMap.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -18,7 +19,7 @@ public:
 	void Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshData>& meshes);
 	// Model File로부터 데이터를 읽어와서 초기화
 	void Initialize(ComPtr<ID3D11Device>& device, const std::string& basePath, const std::string& fileName);
-	void Render(ComPtr<ID3D11DeviceContext>& context, bool drawNormal = false);
+	void Render(ComPtr<ID3D11DeviceContext>& context, CubeMap& cubeMap);
 	void UpdateConstantBuffers(ComPtr<ID3D11DeviceContext>& context);
 
 public:
@@ -27,6 +28,9 @@ public:
 	MeshPSConstData m_constantPSBufferData;
 	MeshNormalConstData m_constantNormalBufferData;
 
+	bool useTexture = false;
+	bool drawNormal = false;
+	float normalScale = 0.005f;
 private:
 	// Mesh
 	std::vector<std::shared_ptr<Mesh>> m_meshes;

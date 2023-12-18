@@ -25,8 +25,6 @@ protected:
 	// 원근 투영을 사용할 것인지
 	bool m_usePerspectiveProjection = true;
 	bool m_wireFrame = false;
-	bool m_useTexture = false;
-	bool m_normalLine = false;
 
 	Vector3 modelAxis = {1.f, 0.f, 0.f};
 	Vector3 m_scale = Vector3(0.3f);
@@ -34,11 +32,9 @@ protected:
 	Vector3 m_translation = Vector3(0.f);
 	Vector3 m_rotation = Vector3(0.f);
 
-	float m_normalScale = 0.05f;
-
 	Light m_light;
 	int lightType = 1;
 	float m_diffuse = 0.5f;
 	float m_specular = 1.f;
-	float m_shininess = 8.f; 
+	float m_shininess = 1.f; 
 };

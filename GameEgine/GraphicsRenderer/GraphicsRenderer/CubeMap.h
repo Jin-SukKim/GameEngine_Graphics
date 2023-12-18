@@ -23,6 +23,10 @@ public:
 	// CubeMap Rendering (효율성을 위해 가장 마지막에 Rendering하는 것이 권장된다.)
 	void Render(ComPtr<ID3D11DeviceContext>& context);
 
+	ComPtr<ID3D11ShaderResourceView> GetTextureResView();
+	ComPtr<ID3D11ShaderResourceView> GetDiffuseResView();
+	ComPtr<ID3D11ShaderResourceView> GetSpecularResView();
+
 public:
 	CubeVSConstData m_cubeConstVSBufferData;
 private:

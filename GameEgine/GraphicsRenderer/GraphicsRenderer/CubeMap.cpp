@@ -90,3 +90,18 @@ void CubeMap::Render(ComPtr<ID3D11DeviceContext>& context)
 
 	context->DrawIndexed(m_cubeMap->indexCount, 0, 0);
 }
+
+ComPtr<ID3D11ShaderResourceView> CubeMap::GetTextureResView()
+{
+	return m_cubeMap->txtResView;
+}
+
+ComPtr<ID3D11ShaderResourceView> CubeMap::GetDiffuseResView()
+{
+	return m_cubeMap->diffuseResView;
+}
+
+ComPtr<ID3D11ShaderResourceView> CubeMap::GetSpecularResView()
+{
+	return m_cubeMap->specularResView;
+}

@@ -20,4 +20,6 @@ struct Material {
 	float dummy1;						// 16byte단위로 전송되기에 더미 데이터
 	Vector3 specular = Vector3(1.f);	// 반사광 - 메탈릭한 재질은 반짝이는 효과 - default(흰색)
 	float dummy2;						// 16byte단위로 전송되기에 더미 데이터
+	Vector3 fresnelR0 = Vector3(1.0f, 0.71f, 0.29f); // Gold
+	float dummy3;
 };

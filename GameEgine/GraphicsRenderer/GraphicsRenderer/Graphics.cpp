@@ -46,16 +46,16 @@ void Graphics::Update(float dt)
     using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_rotation);
-    Matrix model = Matrix::CreateScale(m_scale)
+    Matrix world = Matrix::CreateScale(m_scale)
         * Matrix::CreateFromQuaternion(q)
         * Matrix::CreateTranslation(m_translation);
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
-    m_mesh.m_constantVSBufferData.model = model.Transpose(); // Row-Major -> Column-Major 변환
+    m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
 
-    m_mesh.m_constantVSBufferData.invModel = m_mesh.m_constantVSBufferData.model;
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.world;
     // 오류 방지
-    m_mesh.m_constantVSBufferData.invModel.Translation(Vector3(0.f));
-    m_mesh.m_constantVSBufferData.invModel = m_mesh.m_constantVSBufferData.invModel.Transpose().Invert();
+    m_mesh.m_constantVSBufferData.invWorld.Translation(Vector3(0.f));
+    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.invWorld.Transpose().Invert();
 
     // 카메라의 이동
     UserInput(dt);

@@ -23,7 +23,7 @@ m_screenViewPort(D3D11_VIEWPORT()) { // viewPort 지정
 
 	app = this;
 
-	m_camera = Camera({ 0.0f, 0.0f, -0.5f }, { 0.0f, 0.0f, 0.0f });
+	m_camera = Camera({ 0.0f, 0.0f, -0.5f });
 	m_camera.SetAspectRatio(GetAspectRatio());
 } 
 
@@ -115,16 +115,11 @@ void AppBase::OnMouseMove(int mouseX, int mouseY)
 	float y = -(float)mouseY * 2 / m_screenHeight + 1.f;
 
 	// 범위 밖으로 나가지 않도록 clamp 
-	// 이전 좌표와의 차이
-	float gapX = std::clamp(x, -1.f, 1.f) - prevX;
-	float gapY = std::clamp(y, -1.f, 1.f) - prevY;
+	x = std::clamp(x, -1.0f, 1.0f);
+	y = std::clamp(y, -1.0f, 1.0f);
 
-	prevX = x;
-	prevY = y;
-
-	std::cout << gapX << ' ' << gapY << '\n';
 	// 카메라 시점 회전
-	//m_camera.MouseRotate(gapX, gapY);
+	m_camera.MouseRotate(x, y);
 }
 
 LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

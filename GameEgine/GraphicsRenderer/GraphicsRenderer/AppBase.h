@@ -77,6 +77,7 @@ public:
 	ComPtr<ID3D11DeviceContext> m_context;
 	ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
 	ComPtr<IDXGISwapChain> m_swapChain;
+	// 그래픽을 표시하기 위해 벡터 정보를 픽셀로 변환 (Clipping, Culling, 원근 투영 등을 한다)
 	ComPtr<ID3D11RasterizerState> m_SolidRasterizerState;
 	ComPtr<ID3D11RasterizerState> m_WireRasterizerState;
 

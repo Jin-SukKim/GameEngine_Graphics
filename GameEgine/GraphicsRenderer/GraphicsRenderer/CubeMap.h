@@ -7,7 +7,6 @@
 
 #include "Mesh.h"
 #include "MeshData.h"
-#include "ConstantData.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -28,6 +27,9 @@ public:
 	ComPtr<ID3D11ShaderResourceView> GetSpecularResView();
 
 public:
+	struct CubeVSConstData {
+		Matrix viewProj; // 보통 View, Projection 행렬은 미리 곱해서 사용한다.
+	};
 	CubeVSConstData m_cubeConstVSBufferData;
 private:
 	// Mesh Data

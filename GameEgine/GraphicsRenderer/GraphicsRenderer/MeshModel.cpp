@@ -29,7 +29,7 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 	device->CreateSamplerState(&sampDesc, m_samplerState.GetAddressOf());
 
 	// Constant Buffer 积己
-	m_constantVSBufferData.world = Matrix(); // world 青纺
+	m_constantVSBufferData.model = Matrix(); // world 青纺
 	//m_constantVSBufferData.view = Matrix(); // View 青纺
 	//m_constantVSBufferData.proj = Matrix(); // Projection 青纺
 	m_constantVSBufferData.viewProj = Matrix(); // viewPorjection 青纺

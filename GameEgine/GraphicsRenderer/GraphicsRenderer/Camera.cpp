@@ -3,6 +3,7 @@
 #include <iostream>
 Camera::Camera(Vector3 pos) : m_camPos(pos) {}
 
+// 카메라는 월드 좌표계 관점에서 이동한 뒤 회전시켜줘야 한다.
 Matrix Camera::GetFPPViewRowMatrix()
 {
     // View 좌표계에서는 정면 방향이 +z, 오른쪽이 +x, 위쪽이 +y이다.
@@ -55,21 +56,13 @@ void Camera::MouseRotate(float mouseNdcX, float mouseNdcY)
     m_yaw = mouseNdcX * m_sensitivityX * DirectX::XM_2PI; 
     // mouseNdcY가 -값일 떄 아래로 회전하고 +면 위로 회전하려면 -를 붙여서 저장해준다.
     // 스크린 좌표계는 y값이 아래로 갈수록 커지기에 -로 반전시켜주는 것이다.
-    // 위/아래 회전(z 축을 중심으로 회전) - 위 아래 90도 회전
+    // 위/아래 회전(x 축을 중심으로 회전) - 위 아래 90도 회전
     m_pitch = mouseNdcY * m_sensitivityY * DirectX::XM_PIDIV2; 
-
-    Matrix rot = Matrix();
-    if (m_yaw)
-        rot *= Matrix::CreateRotationX(m_yaw);
-    if (m_pitch) 
-        rot *= Matrix::CreateRotationY(m_pitch);
 
     m_camDir = Vector3::Transform(Vector3(0.0f, 0.0f, 1.0f),
         Matrix::CreateRotationY(m_yaw));
     m_camUp = Vector3::Transform({ 0.f, 1.f, 0.f }, Matrix::CreateRotationY(m_pitch));
     m_camRight = m_camUp.Cross(m_camDir);
-
-    //m_camLookAt = Vector3::Transform(m_camLookAt, rot);
 }
 
 void Camera::SetAspectRatio(float aspect)

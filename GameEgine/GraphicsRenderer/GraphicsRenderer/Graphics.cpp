@@ -50,12 +50,17 @@ void Graphics::Update(float dt)
         * Matrix::CreateFromQuaternion(q)
         * Matrix::CreateTranslation(m_translation);
     // DirectX는 Row-Major 사용하나 HLSL같은 Shader 프로그램은 Column-Major 사용
-    m_mesh.m_constantVSBufferData.world = world.Transpose(); // Row-Major -> Column-Major 변환
+    m_mesh.m_constantVSBufferData.model = world.Transpose(); // Row-Major -> Column-Major 변환
 
-    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.world;
-    // 오류 방지
-    m_mesh.m_constantVSBufferData.invWorld.Translation(Vector3(0.f));
-    m_mesh.m_constantVSBufferData.invWorld = m_mesh.m_constantVSBufferData.invWorld.Transpose().Invert();
+    m_mesh.m_constantVSBufferData.invTranspose = m_mesh.m_constantVSBufferData.model;
+    // 수치 에러 방지 - inverse-Transpose로 model 행렬을 transpose 시켜서 
+    // 영향을 주지 않아야 할 이동 행렬이 w값에 영향을 주기에 조정을 해준다.
+    // (hlsl에서 normal vector를 w값 저장을 안해 문제가 없을 수도 있을 것 같다.)
+    // 여기서 원점으로 이동 시키면
+    m_mesh.m_constantVSBufferData.invTranspose.Translation(Vector3(0.f)); 
+    // 결국 w column 값이 (0.0, 0.0, 0.0, 1)이 된다.
+    m_mesh.m_constantVSBufferData.invTranspose 
+        = m_mesh.m_constantVSBufferData.invTranspose.Transpose().Invert();
 
     // 카메라의 이동
     UserInput(dt);

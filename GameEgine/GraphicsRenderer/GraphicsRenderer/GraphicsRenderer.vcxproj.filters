@@ -74,6 +74,9 @@
     <ClCompile Include="CubeMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImageFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppBase.h">
@@ -143,6 +146,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="CubeMap.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageFilter.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

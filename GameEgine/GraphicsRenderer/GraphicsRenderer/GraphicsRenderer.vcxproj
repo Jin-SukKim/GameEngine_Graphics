@@ -168,6 +168,7 @@
     <ClCompile Include="D3D11Utils.cpp" />
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="ImageFilter.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshModel.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="D3D11Utils.h" />
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="ImageFilter.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />

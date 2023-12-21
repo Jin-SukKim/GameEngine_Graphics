@@ -13,8 +13,14 @@ using DirectX::SimpleMath::Matrix;
 // 16 byte 단위 (float 4개) 단위로 전송
 // Matrix = XMFLOAT4 = float 4개
 struct MeshVSConstData {
-	Matrix world;	 // Model을 world space 좌표로 변환
-	Matrix invWorld; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용 (월드 좌표계에서 모델 좌표계로 변환하기 위한 행렬)
+	Matrix model;	 // Model을 world space 좌표로 변환
+	/*
+		normal vector는 벡터이기에 이동은 되지 않지만 scale과 roation엔 영향을 받는다.
+		normal vector도 회전해야 하기에 문제가 되지 않지만 scale은 문제가 된다.
+		그래서 model 행렬의 Inverse Transpose를 적용하면 normal vector를 수직으로 변환할 수 있다.
+	*/ 
+	// normal vector에 non-uniform scale이 적용되면 모델의 포면과 수직이 아니게 된다.
+	Matrix invTranspose; // 조명 효과를 위해 제대로 변환된 normal을 계산하기 위해 사용 (월드 좌표계에서 모델 좌표계로 변환하기 위한 행렬)
 	/*
 	Matrix view;	 // View 좌표계로 변환
 	Matrix proj;	 // Projection 좌표계로 변환
@@ -40,7 +46,3 @@ struct MeshNormalConstData {
 };
 static_assert((sizeof(MeshNormalConstData) % 16) == 0,
 	"Constant Buffer size must be 16-byte aligned");
-
-struct CubeVSConstData {
-	Matrix viewProj; // 보통 View, Projection 행렬은 미리 곱해서 사용한다.
-};

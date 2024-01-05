@@ -55,6 +55,9 @@ public:
 
 	float GetAspectRatio() const;
 
+	// 현재 윈도우 스크린샷
+	void WriteImage();
+
 	// Pure Virtual Function이기에 자식클래스의 함수 실행
 	virtual void UpdateGUI() = 0;
 	virtual void Update(float dt) = 0;
@@ -64,10 +67,16 @@ protected:
 	bool InitD3D();
 	bool InitGUI();
 
+	bool CreateRenderTargetView();
+	bool CreateDepthBuffer();
+	void SetViewport();
+
 public:
 	int m_screenWidth;
 	int m_screenHeight;
 	HWND m_mainWindow;
+	// MSAA 지원 확인
+	UINT numQualityLevels;
 
 	// Graphics Pipeline이 사용할 자원을 생성할 때는 Device interface가 사용된다.
 	// Resource를 생성, Display Adapter 기능 열거

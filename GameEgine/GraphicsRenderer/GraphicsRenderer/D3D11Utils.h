@@ -72,9 +72,6 @@ public:
 		ComPtr<ID3D11Device>& device,
 		const wchar_t* filename,
 		ComPtr<ID3D11ShaderResourceView>& texResView);
-
-	// 현재 윈도우 스크린샷
-	static void WriteImage();
 };
 
 
@@ -86,14 +83,17 @@ inline void D3D11Utils::CreateVertexBuffer(ComPtr<ID3D11Device>& device, const s
 	bDesc.Usage = D3D11_USAGE_IMMUTABLE; // 초기화 후 변경 x
 	bDesc.ByteWidth = UINT(sizeof(T_VERTEX) * vertices.size()); // 총 메모리
 	bDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bDesc.CPUAccessFlags = 0; // No CPU Acess
-	bDesc.StructureByteStride = sizeof(T_VERTEX); // 몇 비트 단위로 나눌지
+	bDesc.CPUAccessFlags = 0; // No CPU 
+	// 몇 byte 단위로 나눌지 (배열이므로 T_VERTEX structure 크기 단위로 나눈다.)
+	bDesc.StructureByteStride = sizeof(T_VERTEX); 
 
+	// CPU에서 GPU로 데이터를 보낼 때 어떤 데이터를 어떤 형식으로 보낼지 설정
 	D3D11_SUBRESOURCE_DATA vertexBufferData = { 0 }; // 초기화
 	// CPU의 데이터의 Pointer로 이곳부터 데이터 전송 지정
-	vertexBufferData.pSysMem = vertices.data();
+	vertexBufferData.pSysMem = vertices.data(); // vertices의 첫 번째 index 포인터
 	// Vertex Buffer와 같은 buffer resource에선 복수의 Subresource를 가질 수 없다.
-	vertexBufferData.SysMemPitch = 0;
+	// 현재 vertices는 1열로 나열되어 있어 0으로 설정 (2d array이거나 이상이면 알맞게 설정)ㄴ
+	vertexBufferData.SysMemPitch = 0; 
 	vertexBufferData.SysMemSlicePitch = 0;
 
 	// GPU에 Buffer로 사용할 메모리 할당 받아오기

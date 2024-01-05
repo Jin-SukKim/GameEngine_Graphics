@@ -45,6 +45,7 @@ void Graphics::Update(float dt)
 {
     using DirectX::SimpleMath::Quaternion;
     // 모델의 변환 행렬
+
     Quaternion q = Quaternion::CreateFromYawPitchRoll(m_rotation);
     Matrix world = Matrix::CreateScale(m_scale)
         * Matrix::CreateFromQuaternion(q)
@@ -80,20 +81,22 @@ void Graphics::Update(float dt)
     m_mesh.m_constantPSBufferData.material.specular = Vector3(m_specular);
 
     // Light
-    // 여러개의 조명을 사용할 때
-    for (int i = 0; i < MAX_LIGHTS; i++) {
-        // 다른 조명 끄기
-        if (i != lightType) {
-            m_mesh.m_constantPSBufferData.lights[i].strength *= 0.0f;
+    {
+        // 여러개의 조명을 사용할 때
+        for (int i = 0; i < MAX_LIGHTS; i++) {
+            // 다른 조명 끄기
+            if (i != lightType) {
+                m_mesh.m_constantPSBufferData.lights[i].strength *= 0.0f;
+            }
+            else {
+                m_mesh.m_constantPSBufferData.lights[i] = m_light;
+            }
         }
-        else {
-            m_mesh.m_constantPSBufferData.lights[i] = m_light;
-        }
-    }
 
-    if (m_mesh.drawNormal)
-    {   
-        m_mesh.m_constantNormalBufferData.scale = m_mesh.normalScale;
+        if (m_mesh.drawNormal)
+        {
+            m_mesh.m_constantNormalBufferData.scale = m_mesh.normalScale;
+        }
     }
 
     // CubeMapping
@@ -114,6 +117,10 @@ void Graphics::Render()
     // 6. RS: Rasterizer stage - 모델의 기하 정보를 pixel의 집합으로 만든다.
     // 7. PS: Pixel Shader - pixel들을 색을 결정
     // 8. OM: Output-Merger stage - depth buffering 적용 등 실제 FrameBuffer의 색깔 값을 결정한다.
+
+    // context는 Set으로 설정한 것들을 기억하고 있다. 
+    // (즉, Set으로 다시 설정을 바꾸지 않으면 계속 유지된다.
+
 
     // 화면에 출력할 view port 설정
     m_context->RSSetViewports(1, &m_screenViewPort);

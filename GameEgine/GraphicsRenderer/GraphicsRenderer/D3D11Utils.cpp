@@ -29,7 +29,7 @@ void CheckResult(HRESULT hr, ID3DBlob* errorBlob)
 void D3D11Utils::CreateVSAndInputLayout(ComPtr<ID3D11Device>& device, const std::wstring& filename, const std::vector<D3D11_INPUT_ELEMENT_DESC>& inputElements, ComPtr<ID3D11VertexShader>& vertexShader, ComPtr<ID3D11InputLayout>& inputLayout)
 {
 	// 임시로 사용할 데이터를 저장할 공간
-	ComPtr<ID3DBlob> shaderBlob;
+	ComPtr<ID3DBlob> shaderBlob; // 셰이더 컴파일 결과를 bytecode 형태로 저장
 	ComPtr<ID3DBlob> errorBlob;
 
 	UINT compileFlags = 0;
@@ -51,6 +51,22 @@ void D3D11Utils::CreateVSAndInputLayout(ComPtr<ID3D11Device>& device, const std:
 
 	CheckResult(hr, errorBlob.Get());
 
+	/*
+		Shader 컴파일 결과물인 bytecode는 cso 파일로 저장되는데 추후 큰 프로젝트나
+		Shader 파일이 많다면 미리 컴파일한 뒤 cso파일을 읽어서 사용할 수 있다.
+
+		ex)
+			// 파일 읽기(ifstream(path, type), type = bytecode이므로 binary
+			ifstream input("Shader.cso", ios::binary); // 읽기 모드
+			vector<unsigned char> buffer(istreambuf_iterator<char>(input), {});
+			device->CreateVertexShader(buffer.data(), buffer.size9), NULL,&vertexShader);
+	
+		Visual Studio를 이용한 컴파일뿐만 아니라 cmd에서도 가능하다. (cso와 asm 파일 생성)
+		"C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\fxc.exe"
+		C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Shader\Vertex.hlsl
+		T "vs_5_0" /E "main" /Fo "VertexShader.cso" /Fx "VertexShader.asm"
+	*/ 
+	
 	// Shader는 GPU에서 사용하는 프로그램과 같다.
 
 	// InputLayout이 Vertex Shader로 어떤 데이터가 들어갈지 지정
@@ -74,7 +90,7 @@ void D3D11Utils::CreateVSAndInputLayout(ComPtr<ID3D11Device>& device, const std:
 
 void D3D11Utils::CreatePS(ComPtr<ID3D11Device>& device, const std::wstring& filename, ComPtr<ID3D11PixelShader>& pixelShader)
 {
-	ComPtr<ID3DBlob> shaderBlob;
+	ComPtr<ID3DBlob> shaderBlob; // 셰이더 컴파일 결과를 bytecode 형태로 저장
 	ComPtr<ID3DBlob> errorBlob;
 
 	UINT compileFlags = 0;
@@ -123,8 +139,8 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 
 	// 읽은 이미지 데이터 복사
 	image.resize(width * height * 4); // 4채널로 만들어서 복사 (RGBA)
-	// 맞는 채널에 따라 복사
-
+	
+	// 맞는 채널에 따라 복사 (1, 2, 3, 4 채널)
 	switch (channels)
 	{
 	case 1:
@@ -164,6 +180,7 @@ void D3D11Utils::ReadImage(const char* filename, std::vector<uint8_t>& image, in
 		std::cout << "Cannot read " << channels << " channels\n";
 		break;
 	}
+
 	delete[] img;
 }
 

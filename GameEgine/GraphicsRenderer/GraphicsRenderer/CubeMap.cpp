@@ -34,7 +34,7 @@ void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, 
 	device->CreateSamplerState(&sampDesc, m_samplerState.GetAddressOf());
 
 	// Constant Buffer 생성
-	m_cubeConstVSBufferData.viewProj = Matrix();
+	m_cubeConstVSBufferData.viewProj = DirectX::SimpleMath::Matrix();
 	D3D11Utils::CreateConstantBuffer(device, m_cubeConstVSBufferData, m_cubeMap->constantBufferVS);
 
 	// mesh의 버퍼 생성 후 GPU로 복사
@@ -58,7 +58,7 @@ void CubeMap::Initialize(ComPtr<ID3D11Device>& device, const std::wstring path, 
 	D3D11Utils::CreatePS(device, L"Shader/CubeMapPS.hlsl", m_cubePS);
 }
 
-void CubeMap::UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, const Matrix& view, const Matrix& proj)
+void CubeMap::UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, const DirectX::SimpleMath::Matrix& view, const DirectX::SimpleMath::Matrix& proj)
 {
 	// Transpose 해서 들어온 값
 	m_cubeConstVSBufferData.viewProj = proj * view;

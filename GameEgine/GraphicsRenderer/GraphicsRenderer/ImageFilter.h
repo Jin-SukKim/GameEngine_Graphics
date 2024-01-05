@@ -54,13 +54,13 @@ private:
 	ComPtr<ID3D11SamplerState> m_samplerState;
 	ComPtr<ID3D11RasterizerState> m_rasterizerState;
 	
-	// 화면(윈도우)에 렌더링
+	// 화면(주로 윈도우) 어디에 렌더링할 지
 	D3D11_VIEWPORT m_viewPort;
 
 	// 받아서 사용하기에 포인터로 충분
 	// 사용할 texture들의 view
 	std::vector<ID3D11ShaderResourceView*> m_shaderResources; 
-	// 렌더링 시 사용할 RenderTarget Texture의 view
+	// 어디에 렌더링할 지
 	std::vector<ID3D11RenderTargetView*> m_renderTargets;
 };
 

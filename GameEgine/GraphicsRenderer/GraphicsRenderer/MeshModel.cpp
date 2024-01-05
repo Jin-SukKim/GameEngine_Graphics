@@ -36,6 +36,7 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 	D3D11Utils::CreateConstantBuffer(device, m_constantVSBufferData, m_meshVSConstantBuffer);
 	D3D11Utils::CreateConstantBuffer(device, m_constantPSBufferData, m_meshPSConstantBuffer);
 
+	// 모든 메쉬를 가져와 Vertex, Index, Texture와 Constant Data 생성 및 설정
 	for (const MeshData& mData : meshes)
 	{
 		std::shared_ptr<Mesh> newMesh = std::make_shared<Mesh>();
@@ -79,49 +80,51 @@ void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::vector<MeshD
 	D3D11Utils::CreatePS(device, L"Shader/BasicPS.hlsl", m_meshPixelShader);
 
 	// Normal Vector 그리기 - 위에서 생성한 InputLayout을 같이 사용
-	m_normal = std::make_shared<Mesh>();
+	{
+		m_normal = std::make_shared<Mesh>();
 
-	std::vector<Vertex> normalVertices;
-	std::vector<uint32_t> normalIndices;
+		std::vector<Vertex> normalVertices;
+		std::vector<uint32_t> normalIndices;
 
-	// 여러 메쉬의 normal들을 하나로 합치기
-	size_t offset = 0;
-	for (const MeshData& mData : meshes) {
-		// 생성한 Mesh의 data 사용
-		for (size_t i = 0; i < mData.vertices.size(); i++)
-		{
-			Vertex v = mData.vertices[i];
+		// 여러 메쉬의 normal들을 하나로 합치기
+		size_t offset = 0;
+		for (const MeshData& mData : meshes) {
+			// 생성한 Mesh의 data 사용
+			for (size_t i = 0; i < mData.vertices.size(); i++)
+			{
+				Vertex v = mData.vertices[i];
 
-			// 시작점과 끝점의 좌표가 같지만 texcoord의 값이 0.f, 1.f로 다르기에 vertex shader에서 변환
-			// Normal Vector는 선분이기에 texcoord는 x좌표만 사용
-			// 시작점
-			v.texcoord.x = 0.f;
-			normalVertices.push_back(v);
+				// 시작점과 끝점의 좌표가 같지만 texcoord의 값이 0.f, 1.f로 다르기에 vertex shader에서 변환
+				// Normal Vector는 선분이기에 texcoord는 x좌표만 사용
+				// 시작점
+				v.texcoord.x = 0.f;
+				normalVertices.push_back(v);
 
-			// 끝점
-			v.texcoord.x = 1.f;
-			normalVertices.push_back(v);
+				// 끝점
+				v.texcoord.x = 1.f;
+				normalVertices.push_back(v);
 
-			// 0-1 선분, 2-3 선분 etc
-			normalIndices.push_back(uint32_t(2 * (i + offset)));
-			normalIndices.push_back(uint32_t(2 * (i + offset) + 1));
+				// 0-1 선분, 2-3 선분 etc
+				normalIndices.push_back(uint32_t(2 * (i + offset)));
+				normalIndices.push_back(uint32_t(2 * (i + offset) + 1));
+			}
+			// 1d array를 2d array로 사용하는 것처럼 여러 메쉬들의 normal을
+			// offset을 활용해 하나로 합쳐준다.
+			offset += mData.vertices.size();
 		}
-		// 1d array를 2d array로 사용하는 것처럼 여러 메쉬들의 normal을
-		// offset을 활용해 하나로 합쳐준다.
-		offset += mData.vertices.size();
+
+		// Normal Line의 vertex와 index buffer 생성
+		D3D11Utils::CreateVertexBuffer(device, normalVertices, m_normal->vertexBuffer);
+		m_normal->indexCount = (UINT)normalIndices.size();
+		D3D11Utils::CreateIndexBuffer(device, normalIndices, m_normal->indexBuffer);
+
+		D3D11Utils::CreateConstantBuffer(device, m_constantNormalBufferData, m_meshNormalConstantBuffer);
+
+		// Normal Vector Line의 Shader 생성
+		D3D11Utils::CreateVSAndInputLayout(
+			device, L"Shader/NormalVS.hlsl", inputElements, m_meshNormalVertexShader, m_meshInputLayout);
+		D3D11Utils::CreatePS(device, L"Shader/NormalPS.hlsl", m_meshNormalPixelShader);
 	}
-
-	// Normal Line의 vertex와 index buffer 생성
-	D3D11Utils::CreateVertexBuffer(device, normalVertices, m_normal->vertexBuffer);
-	m_normal->indexCount = (UINT)normalIndices.size();
-	D3D11Utils::CreateIndexBuffer(device, normalIndices, m_normal->indexBuffer);
-
-	D3D11Utils::CreateConstantBuffer(device, m_constantNormalBufferData, m_meshNormalConstantBuffer);
-
-	// Normal Vector Line의 Shader 생성
-	D3D11Utils::CreateVSAndInputLayout(
-		device, L"Shader/NormalVS.hlsl", inputElements, m_meshNormalVertexShader, m_meshInputLayout);
-	D3D11Utils::CreatePS(device, L"Shader/NormalPS.hlsl", m_meshNormalPixelShader);
 }
 
 void MeshModel::Initialize(ComPtr<ID3D11Device>& device, const std::string& basePath, const std::string& fileName)
@@ -154,7 +157,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, CubeMap& cubeMap)
 
 
 	// Vertex Buffer의 단위와 offset 설정
-	UINT stride = sizeof(Vertex);
+	UINT stride = sizeof(Vertex); // 몇 비트 단위로 읽을지
 	UINT offset = 0;
 	for (const std::shared_ptr<Mesh>& mesh : m_meshes)
 	{
@@ -184,7 +187,7 @@ void MeshModel::Render(ComPtr<ID3D11DeviceContext>& context, CubeMap& cubeMap)
 		context->PSSetShaderResources(0, 4, pixelResources->GetAddressOf()); // txtResView 넘기기
 		context->PSSetConstantBuffers(0, 1, mesh->constantBufferPS.GetAddressOf());
 
-		// Input Layout 설정
+		// Input Layout 설정 (Normal Vector 그릴때도 같이 사용)
 		context->IASetInputLayout(m_meshInputLayout.Get());
 		// Vertex/Index Buffer 설정
 		context->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);

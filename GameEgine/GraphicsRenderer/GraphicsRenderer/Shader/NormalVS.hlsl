@@ -22,9 +22,9 @@ PSInput vsMain(VSInput input)
     pos = mul(pos, model); // 월드 좌표계로 변환
     
     // Normal Vector의 방향을 알아야 선분의 끝점을 그릴 수 있다.
-    float4 normal = float4(input.normalWorld, 0.0f);
+    float4 normal = float4(input.normalWorld, 0.0f); // 벡터
     output.normalWorld = mul(normal, invTranspose).xyz; // Normal Vector 재조정
-    output.normalWorld = normalize(output.normalWorld);
+    output.normalWorld = normalize(output.normalWorld); // Normal Vector의 방향
     
     // 현재 normal의 끝점과 시작점은 같은 좌표에 있으므로
     // texcoord가 0.0, 1.0으로 다른 걸 이용해 선분으로 변환

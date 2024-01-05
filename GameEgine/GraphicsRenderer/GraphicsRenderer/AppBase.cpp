@@ -129,8 +129,29 @@ LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	switch (uMsg)
 	{
-	case WM_SIZE:
+	case WM_SIZE: // 윈도우 사이즈가 변하면 호출
 		// Reset and resize swapchain
+		//std::cout << (UINT)LOWORD(lParam) << " " << (UINT)HIWORD(lParam) << std::endl;
+
+		// WM_SIZE는 윈도우가 처음 생성되도 실행된다.
+
+		// 처음 실행이 아니면 크기가 달라졌으므로 RenderTarget, depth, viewport를 다시 설정해준다.
+		if (m_swapChain) { 
+			m_screenWidth = int(LOWORD(lParam));
+			m_screenHeight = int(HIWORD(lParam));
+			
+			m_backBufferRTV.Reset();
+			// 윈도우 resize를 대비해 directx에 resize함수가 존재한다.
+			m_swapChain->ResizeBuffers(0, // 현재 개수 유지
+				(UINT)LOWORD(lParam), // 해상도 변경
+				(UINT)HIWORD(lParam),
+				DXGI_FORMAT_UNKNOWN, // 현재 포맷 유지
+				0);
+			// swapChain의 해상도를 변경했기에 RenderTargetView와 Depth buffer도 변경
+			CreateRenderTargetView();
+			CreateDepthBuffer();
+			SetViewport();
+		}
 		break;
 	case WM_SYSCOMMAND:
 		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
@@ -260,164 +281,154 @@ bool AppBase::InitD3D()
 	};
 	// 실제로 사용 가능한 버전 저장
 	D3D_FEATURE_LEVEL featureLevel;
-
-	// Swap-Chain 설정
-	DXGI_SWAP_CHAIN_DESC sd;
-	// 초기화
-	ZeroMemory(&sd, sizeof(sd));
-	// 해상도 지정
-	sd.BufferDesc.Width = m_screenWidth;
-	sd.BufferDesc.Height = m_screenHeight;
-	// Color data format
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferCount = 2; // 더블 버퍼링
-	// 1초당 60번 refresh (60 Frame)
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	// RenderTarget의 출력으로 사용
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = m_mainWindow; // 출력할 윈도우
-	sd.Windowed = TRUE; // 테두리 있는 윈도우 모드
-	// 윈도우창 모드와 전체화면 모드 변경 가능
-	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // _FLIP_ 사용 시 MSAA 미지원
-	// 마지막 swap-chain의 buffer는 MSAA를 사용하지 않는다.
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-
-	// Swap-Chain, device, context 생성
-	if (FAILED(D3D11CreateDeviceAndSwapChain(
-		0,								// IDXGIAdapter Type (default)
-		driverType,						// graphic driver type
-		0,								// 별도의 드라이버 사용시 설정
-		createDeviceFlags,				// 현재 Debuging 모드 옵션 설정
-		featureLevelArray,				// Graphic api version
-		ARRAYSIZE(featureLevelArray),
-		D3D11_SDK_VERSION,				// 대부분 D3D11_SDK_VERSION으로 설정
-		&sd,							// Swap-Chain 설정
-		m_swapChain.GetAddressOf(),		// 생성한 Swap-Chain 저장
-		m_device.GetAddressOf(),		// 생성한 Direct3D device 저장
-		&featureLevel,					// 사용할 버전 저장
-		m_context.GetAddressOf()		// 생성한 context 저장
-	)))
+	
+	// Device와 Context 생성 및 MSAA 설정
 	{
-		std::cout << "D3D11CreateDeviceAndSwapChain() failed.\n";
-		return false;
+
+		// 문제가 없는지 지역 변수로 일단 생성
+		ComPtr<ID3D11Device> device;
+		ComPtr<ID3D11DeviceContext> context;
+
+		if (FAILED(D3D11CreateDevice(
+			nullptr,    // Specify nullptr to use the default adapter.
+			driverType, // Create a device using the hardware graphics driver.
+			0, // Should be 0 unless the driver is D3D_DRIVER_TYPE_SOFTWARE.
+			createDeviceFlags, // Set debug and Direct2D compatibility flags.
+			featureLevelArray,     // List of feature levels this app can support.
+			ARRAYSIZE(featureLevelArray), // Size of the list above.
+			D3D11_SDK_VERSION,     // Always set this to D3D11_SDK_VERSION for
+			// Microsoft Store apps.
+			device.GetAddressOf(), // Returns the Direct3D device created.
+			&featureLevel,         // Returns feature level of device created.
+			context.GetAddressOf() // Returns the device immediate context.
+		))) {
+			std::cout << "D3D11CreateDevice() failed." << std::endl;
+			return false;
+		}
+
+		// MSAA 지원 확인
+		device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &numQualityLevels);
+		if (numQualityLevels <= 0)
+		{
+			std::cout << "MSAA not supported.\n";
+		}
+
+		numQualityLevels = 0; // MSAA 강제로 끄기
+
+		// device와 device context가 문제없이 생성 됬다면 As()를 사용해 멤버 변수로 복사
+		if (FAILED(device.As(&m_device))) {
+			std::cout << "device.AS() failed.\n";
+			return false;
+		}
+
+		if (FAILED(context.As(&m_context))) {
+			std::cout << "context.AS() failed.\n";
+			return false;
+		}
 	}
 
-	if (featureLevel != D3D_FEATURE_LEVEL_11_0) {
-		std::cout << "D3D Feature Level 11 not supported.\n";
-		return false;
-	}
-
-	// MSAA 지원 확인
-	UINT numQualityLevels;
-	m_device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &numQualityLevels);
-	if (numQualityLevels <= 0)
+	// Swap-Chain 생성 및 Device, Context 재생성해 재설정
 	{
-		std::cout << "MSAA not supported.\n";
+		// Swap-Chain 설정
+		DXGI_SWAP_CHAIN_DESC sd;
+		// 초기화 (옵션이 많으니 일일이 초기화하기는 번거로워 한번에 초기화)
+		ZeroMemory(&sd, sizeof(sd));
+		// 해상도 지정
+		sd.BufferDesc.Width = m_screenWidth;
+		sd.BufferDesc.Height = m_screenHeight;
+		// Color data format
+		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		sd.BufferCount = 2; // 더블 버퍼링
+		// 1초당 60번 refresh (60 Frame)
+		sd.BufferDesc.RefreshRate.Numerator = 60;
+		sd.BufferDesc.RefreshRate.Denominator = 1;
+		// RenderTarget의 출력으로 사용
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		sd.OutputWindow = m_mainWindow; // 출력할 윈도우
+		sd.Windowed = TRUE; // 테두리 있는 윈도우 모드, False = 전체화면
+		// 윈도우창 모드와 전체화면 모드 변경 가능
+		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; // _FLIP_ 사용 시 MSAA 미지원
+		if (numQualityLevels > 0) {
+			sd.SampleDesc.Count = 4; // multisampling 수
+			sd.SampleDesc.Quality = numQualityLevels - 1;
+		}
+		else {
+			// 마지막 swap-chain의 buffer는 MSAA를 사용하지 않는다.
+			sd.SampleDesc.Count = 1;
+			sd.SampleDesc.Quality = 0;
+		}
+
+		if (featureLevel != D3D_FEATURE_LEVEL_11_0) {
+			std::cout << "D3D Feature Level 11 not supported.\n";
+			return false;
+		}
+
+		// Swap-Chain, device, context 생성
+		if (FAILED(D3D11CreateDeviceAndSwapChain(
+			0,								// IDXGIAdapter Type (default)
+			driverType,						// graphic driver type
+			0,								// 별도의 드라이버 사용시 설정
+			createDeviceFlags,				// 현재 Debuging 모드 옵션 설정
+			featureLevelArray,				// Graphic api version
+			ARRAYSIZE(featureLevelArray),
+			D3D11_SDK_VERSION,				// 대부분 D3D11_SDK_VERSION으로 설정
+			&sd,							// Swap-Chain 설정
+			m_swapChain.GetAddressOf(),		// 생성한 Swap-Chain 저장
+			m_device.GetAddressOf(),		// 생성한 Direct3D device 저장
+			&featureLevel,					// 사용할 버전 저장
+			m_context.GetAddressOf()		// 생성한 context 저장
+		)))
+		{
+			std::cout << "D3D11CreateDeviceAndSwapChain() failed.\n";
+			return false;
+		}
 	}
 
-
-	// Swap-Chain의 Back-Buffer (화면 출력)
-	ComPtr<ID3D11Texture2D> backBuffer;
-	// 생성한 Swap-Chain으로부터 Buffer를 가져와 BackBuffer로 설정
-	m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
-	if (!backBuffer)
-	{
-		std::cout << "Create BackBuffer RenderTargetVeiw() failed.\n";
+	// RenderTargetView 생성
+	if (!CreateRenderTargetView())
 		return false;
-	}
-	// 렌더링 시에 RenderTargetView에 렌더링을 하는데 Swap-Chain이 가진 버퍼에 렌더링하겠다고 지정
-	m_device->CreateRenderTargetView(backBuffer.Get(), NULL, m_backBufferRTV.GetAddressOf());
 
-	// ViewPort 설정
-	ZeroMemory(&m_screenViewPort, sizeof(D3D11_VIEWPORT)); // 메모리 초기화
-	// 렌더링할 화면 크기 설정
-	m_screenViewPort.TopLeftX = 0;
-	m_screenViewPort.TopLeftY = 0;
-	m_screenViewPort.Width = static_cast<float>(m_screenWidth);
-	m_screenViewPort.Height = static_cast<float>(m_screenHeight);
-	// depth buffering을 사용하기 위해 설정
-	m_screenViewPort.MinDepth = 0.0f;
-	m_screenViewPort.MaxDepth = 1.0f;
-
-	// 설정한 Viewport 적용
-	// Rasterization Stage(RS) - 3차원 공간의 Vertex를 화면에 투영시켜주는 과정
-	m_context->RSSetViewports(1, &m_screenViewPort);
+	// Viewport 설정
+	SetViewport();
 	
 	// Rasterization 방법 설정
-	D3D11_RASTERIZER_DESC rastDesc;
-	ZeroMemory(&rastDesc, sizeof(D3D11_RASTERIZER_DESC)); // 메모리 초기화
-	// 어떻게 렌더링할 지 설정 (WireFrame, Solid etc)
-	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-	rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK; // 삼각형 뒷면 제외
-	// 삼각형 앞면이 Clock-Wise로 설정
-	rastDesc.FrontCounterClockwise = false; 
-
-	// RasterizerState 생성
-	m_device->CreateRasterizerState(&rastDesc, m_SolidRasterizerState.GetAddressOf());
-
-	// WireFrame 용 RasterizerState 생성
-	rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
-	m_device->CreateRasterizerState(&rastDesc, m_WireRasterizerState.GetAddressOf());
-
-	// Depth Buffer 옵션 설정
-	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-	depthStencilBufferDesc.Width = m_screenWidth;
-	depthStencilBufferDesc.Height = m_screenHeight;
-	depthStencilBufferDesc.MipLevels = 1;
-	depthStencilBufferDesc.ArraySize = 1;
-	// Depth 24bit / Stencil 8 bit 사용
-	depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	// 현재 Depth만 사용하고 MSAA는 사용하고 있지 않다.
-	depthStencilBufferDesc.SampleDesc.Count = 1;
-	depthStencilBufferDesc.SampleDesc.Quality = 0;
-	/*
-	// MSAA
-	if (numQualityLevels > 0)
 	{
-		depthStencilBufferDesc.SampleDesc.Count = 4; // 몇 개를 MultiSamples할 지
-		depthStencilBufferDesc.SampleDesc.Quality = numQualityLevels - 1;
-	}
-	else {
-		depthStencilBufferDesc.SampleDesc.Count = 1;
-		depthStencilBufferDesc.SampleDesc.Quality = 0;
-	}
-	*/
-	// DepthStencil 메모리 공간 사용 설정
-	depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT; // GPU가 읽고 쓰기 가능
-	// Depth/Stencil 버퍼로 사용 가능
-	depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilBufferDesc.CPUAccessFlags = 0;
-	depthStencilBufferDesc.MiscFlags = 0;
+		D3D11_RASTERIZER_DESC rastDesc;
+		ZeroMemory(&rastDesc, sizeof(D3D11_RASTERIZER_DESC)); // 메모리 초기화
+		// 어떻게 렌더링할 지 설정 (WireFrame, Solid etc)
+		rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+		rastDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK; // 삼각형 뒷면 제외
+		// 삼각형 앞면이 Clock-Wise로 설정
+		rastDesc.FrontCounterClockwise = false;
 
-	// 그래픽 카드에 메모리 생성하는 것이라 device interface를 통해 Texture2D 메모리 생성
-	if (FAILED(m_device->CreateTexture2D(
-		&depthStencilBufferDesc, 0, m_depthStencilBuffer.GetAddressOf())))
-	{
-		std::cout << "CreateTexture2D() failed.\n";
+		// RasterizerState 생성
+		m_device->CreateRasterizerState(&rastDesc, m_SolidRasterizerState.GetAddressOf());
+
+		// WireFrame 용 RasterizerState 생성
+		rastDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+		m_device->CreateRasterizerState(&rastDesc, m_WireRasterizerState.GetAddressOf());
 	}
-	// Shader에서 사용하기 위해 DepthStencilView 생성
-	if (FAILED(m_device->CreateDepthStencilView(
-		m_depthStencilBuffer.Get(), 0, &m_depthStencilView)))
-	{
-		std::cout << "CreateDepthStencilView() failed.\n";
-	}
+
+	// Depth Buffer 생성
+	if (!CreateDepthBuffer())
+		return false;
 
 	// DepthStencil 설정
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC)); // 메모리 초기화
-	// depth 값 업데이트 가능하도록 설정
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
-	// Depth값이 더 가까운 걸 그리도록 설정
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-	// 생성한 설정 적용
-	if (FAILED(m_device->CreateDepthStencilState(
-		&depthStencilDesc, m_depthStencilState.GetAddressOf())))
 	{
-		std::cout << "CreateDepthStencilState() failed.\n";
+		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+		ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC)); // 메모리 초기화
+		// depth 값 업데이트 가능하도록 설정
+		depthStencilDesc.DepthEnable = true;
+		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+		// Depth값이 더 가까운 걸 그리도록 설정
+		depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		// 생성한 설정 적용
+		if (FAILED(m_device->CreateDepthStencilState(
+			&depthStencilDesc, m_depthStencilState.GetAddressOf())))
+		{
+			std::cout << "CreateDepthStencilState() failed.\n";
+		}
 	}
 
 	return true;
@@ -455,4 +466,87 @@ bool AppBase::InitGUI()
 		return false;
 
 	return true;
+}
+
+bool AppBase::CreateRenderTargetView()
+{
+	// Swap-Chain의 Back-Buffer (화면 출력)
+	ComPtr<ID3D11Texture2D> backBuffer;
+	// 생성한 Swap-Chain이 가지고 있는 Buffer를 가져와 BackBuffer로 설정
+	m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
+	if (!backBuffer)
+	{
+		std::cout << "Create BackBuffer RenderTargetVeiw() failed.\n";
+		return false;
+	}
+	// 렌더링 시에 RenderTargetView에 렌더링을 하는데 Swap-Chain이 가진 버퍼에 렌더링하겠다고 지정
+	m_device->CreateRenderTargetView(backBuffer.Get(), NULL, m_backBufferRTV.GetAddressOf());
+
+	return true;
+}
+
+bool AppBase::CreateDepthBuffer()
+{
+	// Depth Buffer 옵션 설정 (depth 값을 저장하는 메모리)
+	D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+	depthStencilBufferDesc.Width = m_screenWidth;
+	depthStencilBufferDesc.Height = m_screenHeight;
+	depthStencilBufferDesc.MipLevels = 1;
+	depthStencilBufferDesc.ArraySize = 1;
+	// Depth 24bit / Stencil 8 bit 사용
+	depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	// 현재 Depth만 사용하고 MSAA는 사용하고 있지 않다.
+	depthStencilBufferDesc.SampleDesc.Count = 1;
+	depthStencilBufferDesc.SampleDesc.Quality = 0;
+
+	// MSAA
+	if (numQualityLevels > 0)
+	{
+		depthStencilBufferDesc.SampleDesc.Count = 4; // 몇 개를 MultiSamples할 지
+		depthStencilBufferDesc.SampleDesc.Quality = numQualityLevels - 1;
+	}
+	else {
+		depthStencilBufferDesc.SampleDesc.Count = 1;
+		depthStencilBufferDesc.SampleDesc.Quality = 0;
+	}
+
+	// DepthStencil 메모리 공간 사용 설정 (CPU와 GPU의 접근 설정)
+	depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT; // GPU가 읽고 쓰기 가능
+	// Depth/Stencil 버퍼로 사용 가능
+	depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilBufferDesc.CPUAccessFlags = 0;
+	depthStencilBufferDesc.MiscFlags = 0;
+
+	// 그래픽 카드에 메모리 생성하는 것이라 device interface를 통해 Texture2D 메모리 생성
+	if (FAILED(m_device->CreateTexture2D(
+		&depthStencilBufferDesc, 0, m_depthStencilBuffer.GetAddressOf())))
+	{
+		std::cout << "CreateTexture2D() failed.\n";
+	}
+	// Shader에서 사용하기 위해 DepthStencilView 생성
+	if (FAILED(m_device->CreateDepthStencilView(
+		m_depthStencilBuffer.Get(), 0, &m_depthStencilView)))
+	{
+		std::cout << "CreateDepthStencilView() failed.\n";
+	}
+
+	return true;
+}
+
+void AppBase::SetViewport()
+{
+	// ViewPort 설정
+	ZeroMemory(&m_screenViewPort, sizeof(D3D11_VIEWPORT)); // 메모리 초기화
+	// 렌더링할 화면 크기 설정
+	m_screenViewPort.TopLeftX = 0;
+	m_screenViewPort.TopLeftY = 0;
+	m_screenViewPort.Width = static_cast<float>(m_screenWidth);
+	m_screenViewPort.Height = static_cast<float>(m_screenHeight);
+	// depth buffering을 사용하기 위해 설정
+	m_screenViewPort.MinDepth = 0.0f;
+	m_screenViewPort.MaxDepth = 1.0f;
+
+	// 설정한 Viewport 적용
+	// Rasterization Stage(RS) - 3차원 공간의 Vertex를 화면에 투영시켜주는 과정
+	m_context->RSSetViewports(1, &m_screenViewPort);
 }

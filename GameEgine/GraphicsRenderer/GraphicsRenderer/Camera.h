@@ -54,7 +54,7 @@ private:
 
 	float m_camSpeed = 1.f; // 카메라 속도
 	
-	float m_fovAngleY = 70.f;		 // 시야각
+	float m_fovAngleY = 70.f;	 // 시야각
 	float m_nearZ = 0.01f;		 // viewing-frustum의 near plane
 	float m_farZ = 100.f;		 // viewing-frustum의 far plane
 	float m_aspect = 16.f / 9.f; // 대중적인 모니터 비율

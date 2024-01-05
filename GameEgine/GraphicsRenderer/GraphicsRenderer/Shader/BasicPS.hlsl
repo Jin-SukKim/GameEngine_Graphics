@@ -34,6 +34,7 @@ float3 RimLighting(float3 color, float3 toCam, float3 normal)
     return color + rim * rimLights.rimColor * rimLights.rimStrength;
 }
 
+// Environment Mapping (환경 매핑)
 float4 IBLReflect(float3 toCam, float3 normal)
 {
     // Reflect(광선이 들어오는 방향, 노멀 벡터)
@@ -70,7 +71,7 @@ float3 SchlickFresnel(float3 fresnelR0, float3 normal, float3 toCam)
     return fresnelR0 + (1.0 - fresnelR0) * pow(f0, 5.0);
 }
 
-float4 psMain(PSInput input) : SV_TARGET
+float4 psMain(PSInput input) : SV_TARGET // SV_TARGET : 결과를 render target에 저장
 {
     float3 toCam = normalize(camWorld - input.posWorld);
     float3 color = input.color;
@@ -79,6 +80,7 @@ float4 psMain(PSInput input) : SV_TARGET
     // https://forum.unity.com/threads/what-are-unroll-and-loop-when-to-use-them.1283096/
     int i = 0;
     // 각 조명의 index를 생각해서 for loop를 돌려야된다.
+    // [Attribute]로 unroll, loop, fastopt 등이 있다.
     [unroll] // warning X3557: loop only executes for 1 iteration(s), forcing loop to unroll
     for (i = 0; i < NUM_DIR_LIGHTS; ++i)
         color += DirectionalLight(lights[i], input.normalWorld, toCam, material);
@@ -118,6 +120,7 @@ float4 psMain(PSInput input) : SV_TARGET
     float f = SchlickFresnel(material.fresnelR0, input.normalWorld, toCam);
     specular.xyz *= f;
     
+    // Texture 색 설정
     if (useTexture)
     {
         diffuse *= g_texture0.Sample(g_sampler0, input.texcoord);

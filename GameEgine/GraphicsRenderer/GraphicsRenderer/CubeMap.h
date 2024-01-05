@@ -18,7 +18,8 @@ public:
 	void Initialize(ComPtr<ID3D11Device>& device, const std::wstring path,
 		const std::wstring originalFilename, const std::wstring diffuseFilename, const std::wstring specularFileName);
 	// CubeMap의 ViewProj buffer Update
-	void UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, const Matrix& view, const Matrix& proj);
+	void UpdateConstantBuffer(ComPtr<ID3D11DeviceContext>& context, 
+		const DirectX::SimpleMath::Matrix& view, const DirectX::SimpleMath::Matrix& proj);
 	// CubeMap Rendering (효율성을 위해 가장 마지막에 Rendering하는 것이 권장된다.)
 	void Render(ComPtr<ID3D11DeviceContext>& context);
 
@@ -28,7 +29,7 @@ public:
 
 public:
 	struct CubeVSConstData {
-		Matrix viewProj; // 보통 View, Projection 행렬은 미리 곱해서 사용한다.
+		DirectX::SimpleMath::Matrix viewProj; // 보통 View, Projection 행렬은 미리 곱해서 사용한다.
 	};
 	CubeVSConstData m_cubeConstVSBufferData;
 private:

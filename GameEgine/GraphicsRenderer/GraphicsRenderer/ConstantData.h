@@ -32,7 +32,7 @@ static_assert((sizeof(MeshVSConstData) % 16) == 0,
 
 struct MeshPSConstData {
 	Vector3 camWorld; // 시점의 월드 좌표계
-	bool useTexture;
+	bool useTexture; // C++에선 bool이 1 byte지만 HLSL에선 4 byte로 padding이 합쳐 표현된다.
 	Material material;
 	Light lights[MAX_LIGHTS];
 	RimLight rimLight;

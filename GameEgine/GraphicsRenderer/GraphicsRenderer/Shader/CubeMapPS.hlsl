@@ -18,5 +18,7 @@ float4 psMain(PSInput input) : SV_TARGET
     // 하지만 texture 좌표계는 vertex 단위로 interpolation된 값이기에
     // 구의 이음새 부분에서 의도하지 않았던 uv값이 나오는 것이다.
     
+    // CubeMap을 보는 방향이 Sample()에 필요하다. (ex: 중앙에서 CubeMap을 향해 보는 방향)
+    // (이론적으로는 Normalize하는게 맞으나 실제로는 차이가 거의 없다. 아마 GPU Driver에서 최적화를 해주지 않을까?)
     return g_textureCube0.Sample(g_sampler, input.posModel);
 }

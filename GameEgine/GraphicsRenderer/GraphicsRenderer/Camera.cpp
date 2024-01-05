@@ -11,6 +11,8 @@ Matrix Camera::GetFPPViewRowMatrix()
     return Matrix::CreateTranslation(-m_camPos)
         * Matrix::CreateRotationY(-m_yaw)
         * Matrix::CreateRotationX(m_pitch);
+
+    // return XMMatrixLookToLH(m_camPos, m_camDir, m_camUp); 
 }
 
 Matrix Camera::GetProjRowMatrix()
@@ -60,8 +62,9 @@ void Camera::MouseRotate(float mouseNdcX, float mouseNdcY)
     m_pitch = mouseNdcY * m_sensitivityY * DirectX::XM_PIDIV2; 
 
     m_camDir = Vector3::Transform(Vector3(0.0f, 0.0f, 1.0f),
-        Matrix::CreateRotationY(m_yaw));
-    m_camUp = Vector3::Transform({ 0.f, 1.f, 0.f }, Matrix::CreateRotationY(m_pitch));
+        Matrix::CreateRotationY(m_yaw) * Matrix::CreateRotationY(m_pitch));
+    m_camUp = Vector3::Transform({ 0.f, 1.f, 0.f }, 
+        Matrix::CreateRotationY(m_yaw) * Matrix::CreateRotationY(m_pitch));
     m_camRight = m_camUp.Cross(m_camDir);
 }
 

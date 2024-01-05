@@ -5,7 +5,8 @@
 #include <wrl.h>
 
 #include <d3d11.h>
-
+// forward declare(전방선언)을 사용해보도록 하자
+// 필요할때만 include하면 낭비를 줄일 수 있다.
 #include "Mesh.h"
 #include "MeshData.h"
 #include "ConstantData.h"

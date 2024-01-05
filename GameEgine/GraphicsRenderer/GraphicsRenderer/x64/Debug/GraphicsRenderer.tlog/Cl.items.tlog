@@ -13,6 +13,7 @@ C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\CubeMap.cpp;C:\Stud
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\D3D11Utils.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\D3D11Utils.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\GeometryGenerator.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\GeometryGenerator.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\Graphics.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\Graphics.obj
+C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\ImageFilter.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\ImageFilter.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\main.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\main.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\MeshModel.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\MeshModel.obj
 C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\ModelLoader.cpp;C:\Study\Project\GameEgine\GraphicsRenderer\GraphicsRenderer\x64\Debug\ModelLoader.obj

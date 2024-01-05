@@ -23,7 +23,7 @@ PSInput vsMain(VSInput input)
     output.posWorld = pos.xyz; // ¿ùµå ÁÂÇ¥°è
 
     // pos = mul(pos, view); // ºä ÁÂÇ¥°è·Î º¯È¯
-    // pos = mul(pos, proj); // ½ºÅ©¸° ÁÂÇ¥°è·Î º¯È¯
+    // pos = mul(pos, proj); // NDC ÁÂÇ¥°è·Î º¯È¯
  
     pos = mul(pos, viewProj);
     

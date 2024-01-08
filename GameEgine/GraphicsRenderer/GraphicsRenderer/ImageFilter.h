@@ -2,18 +2,21 @@
 #include "D3D11Utils.h"
 #include "GeometryGenerator.h"
 #include "Mesh.h"
+#include "string.h"
 
 class ImageFilter
 {
 public:
 	ImageFilter(ComPtr<ID3D11Device>& device,
 		ComPtr<ID3D11DeviceContext>& context,
+		const std::wstring& vertexPrefix, const std::wstring& pixelPrefix,
 		int width, int height) {
-		Initialize(device, context, width, height);
+		Initialize(device, context, vertexPrefix, vertexPrefix, width, height);
 	}
 
 	void Initialize(ComPtr<ID3D11Device>& device,
 		ComPtr<ID3D11DeviceContext>& context,
+		const std::wstring& vertexPrefix, const std::wstring& pixelPrefix,
 		int width, int height);
 
 	void UpdateConstantBuffers(ComPtr<ID3D11Device>& context);
@@ -56,6 +59,9 @@ private:
 	
 	// 화면(주로 윈도우) 어디에 렌더링할 지
 	D3D11_VIEWPORT m_viewPort;
+	
+	ComPtr<ID3D11ShaderResourceView> m_shaderResourceView;
+	ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 
 	// 받아서 사용하기에 포인터로 충분
 	// 사용할 texture들의 view

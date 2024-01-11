@@ -18,8 +18,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return app->AppProc(hwnd, uMsg, wParam, lParam);
 }
 
-AppBase::AppBase() : m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0),
-m_screenViewPort(D3D11_VIEWPORT()) { // viewPort 지정 
+AppBase::AppBase() : 
+	m_screenWidth(1920), m_screenHeight(1080), m_mainWindow(0), 
+	m_screenViewPort(D3D11_VIEWPORT()), // viewPort 지정 
+	m_lastMouseX(0.f), m_lastMouseY(0.f) { 
 
 	app = this;
 
@@ -120,6 +122,10 @@ void AppBase::OnMouseMove(int mouseX, int mouseY)
 
 	// 카메라 시점 회전
 	m_camera.MouseRotate(x, y);
+
+	// 이전 마우스 위치
+	m_lastMouseX = x;
+	m_lastMouseY = y;
 }
 
 LRESULT AppBase::AppProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

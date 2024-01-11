@@ -14,8 +14,12 @@ bool Graphics::Initialize()
     
     // Cubemap 积己
     {
+        /*
         m_cubeMap.Initialize(m_device, L".\\..\\Assets\\Textures\\Cubemaps\\skybox\\", 
             L"cubemap_bgra.dds", L"cubemap_diffuse.dds", L"cubemap_specular.dds");
+            */
+        m_cubeMap.Initialize(m_device, L".\\..\\Assets\\Textures\\Cubemaps\\",
+            L"Atrium_specularIBL.dds", L"Atrium_diffuseIBL.dds", L"Atrium_specularIBL.dds");
     }
 
     // 扁夯 葛胆 积己
@@ -30,8 +34,8 @@ bool Graphics::Initialize()
         /*
         m_mesh.Initialize(
             m_device, 
-            "C:/Study/Project/GameEgine/GraphicsRenderer/Assets/Models/f3d-data/zelda-breath-of-the-wild/source/zeldaPosed001/",
-            "zeldaPosed001.fbx");
+            "C:/Study/Project/GameEgine/GraphicsRenderer/Assets/Characters/Vanguard/Vanguard/",
+            "vanguard_Mesh.fbx");
             */
         
         m_mesh.Initialize(m_device, { mesh });
